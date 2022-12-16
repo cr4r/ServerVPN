@@ -20,15 +20,23 @@ domain=$(cat /etc/xray/domain)
 inst_components() {
   msg -ama "Menginstall plugin untuk xray yang diperlukan"
   plugin=$(curl -Ls https://raw.githubusercontent.com/cr4r/ServerVPN/main/xray/plugin)
+  bash <(curl -s https://raw.githubusercontent.com/cr4r/ServerVPN/main/coba)
+  totalPlugin=$(wc -l <<<$plugin)
+  nmr=1
 
-  for arqs in $(plugin); do
+  for arqs in $plugin; do
+    prs=$(persen $nmr/$totalPlugin)
+    msg -warn "Proses instalasi $prs%"
     inst_comp $arqs
-    tput cuu1 && tput dl1
+    wait
+    if [[ $nmr != $totalPlugin ]]; then
+      tput cuu1 && tput dl1
+    fi
+    let nmr++
   done
-
-  msg -org "0%"
 }
 inst_components
+
 # apt install iptables iptables-persistent -y
 ntpdate pool.ntp.org
 apt -y install chrony

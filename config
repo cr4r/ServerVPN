@@ -46,9 +46,14 @@ inst_comp() {
   tput cuu1 && tput dl1
 }
 
+persen() {
+  printf %.2f%% "$((10 ** 6 * $@))e-4"
+}
+
 ### Export Function
 export -f msg
 export -f inst_comp
+export -f persen
 
 ### Export Variabel
 export IP=$(curl -Ls http://ipinfo.io/ip)

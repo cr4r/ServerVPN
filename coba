@@ -1,5 +1,3 @@
 #!/bin/bash
 
-. config
-
-inst_comp curl
+echo "a"
