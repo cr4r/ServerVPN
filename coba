@@ -2,11 +2,4 @@
 
 . config
 
-msg -ne "ne=="
-msg -org "org=="
-msg -verm "verm=="
-msg -verm2 "verm2=="
-msg -azu "azu=="
-msg -verd "verd=="
-msg -bra "bra=="
-msg -line
+inst_comp curl

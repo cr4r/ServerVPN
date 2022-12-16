@@ -1,6 +1,7 @@
 #!/bin/bash
-# Mod By SL
 # =====================================================
+
+. config
 
 # Color
 RED='\033[0;31m'
@@ -12,12 +13,23 @@ PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 LIGHT='\033[0;37m'
 
-MYIP=$(wget -qO- ipinfo.io/ip);
+MYIP=$IP
 clear
 domain=$(cat /etc/xray/domain)
-apt install iptables iptables-persistent -y
-apt install curl socat xz-utils wget apt-transport-https gnupg gnupg2 gnupg1 dnsutils lsb-release -y 
-apt install socat cron bash-completion ntpdate -y
+
+inst_components() {
+  msg -ama "Menginstall plugin untuk xray yang diperlukan"
+  plugin=$(curl -Ls https://raw.githubusercontent.com/cr4r/ServerVPN/main/xray/plugin)
+
+  for arqs in $(plugin); do
+    inst_comp $arqs
+    tput cuu1 && tput dl1
+  done
+
+  msg -org "0%"
+}
+inst_components
+# apt install iptables iptables-persistent -y
 ntpdate pool.ntp.org
 apt -y install chrony
 timedatectl set-ntp true
@@ -39,7 +51,7 @@ mkdir -p /usr/bin/xray
 mkdir -p /etc/xray
 
 # / / Unzip Xray Linux 64
-cd `mktemp -d`
+cd $(mktemp -d)
 curl -sL "$xraycore_link" -o xray.zip
 unzip -q xray.zip && rm -rf xray.zip
 mv xray /usr/local/bin/xray
@@ -72,7 +84,7 @@ path_crt="/etc/xray/xray.crt"
 path_key="/etc/xray/xray.key"
 
 # Buat Config Xray
-cat > /etc/xray/config.json << END
+cat >/etc/xray/config.json <<END
 {
   "log": {
     "access": "/var/log/xray/access.log",
@@ -340,9 +352,8 @@ cat > /etc/xray/config.json << END
 }
 END
 
-
 # / / Installation Xray Service
-cat > /etc/systemd/system/xray.service << END
+cat >/etc/systemd/system/xray.service <<END
 [Unit]
 Description=Xray Service Mod By SL
 Documentation=https://nekopoi.care
@@ -369,8 +380,8 @@ iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
 iptables -I INPUT -m state --state NEW -m udp -p udp --dport 80 -j ACCEPT
 iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 2083 -j ACCEPT
 iptables -I INPUT -m state --state NEW -m udp -p udp --dport 2083 -j ACCEPT
-iptables-save > /etc/iptables.up.rules
-iptables-restore -t < /etc/iptables.up.rules
+iptables-save >/etc/iptables.up.rules
+iptables-restore -t </etc/iptables.up.rules
 netfilter-persistent save
 netfilter-persistent reload
 systemctl daemon-reload
@@ -384,7 +395,7 @@ latest_version="$(curl -s "https://api.github.com/repos/p4gefau1t/trojan-go/rele
 trojango_link="https://github.com/p4gefau1t/trojan-go/releases/download/v${latest_version}/trojan-go-linux-amd64.zip"
 mkdir -p "/usr/bin/trojan-go"
 mkdir -p "/etc/trojan-go"
-cd `mktemp -d`
+cd $(mktemp -d)
 curl -sL "${trojango_link}" -o trojan-go.zip
 unzip -q trojan-go.zip && rm -rf trojan-go.zip
 mv trojan-go /usr/local/bin/trojan-go
@@ -394,7 +405,7 @@ touch /etc/trojan-go/akun.conf
 touch /var/log/trojan-go/trojan-go.log
 
 # Buat Config Trojan Go
-cat > /etc/trojan-go/config.json << END
+cat >/etc/trojan-go/config.json <<END
 {
   "run_type": "server",
   "local_addr": "0.0.0.0",
@@ -459,7 +470,7 @@ cat > /etc/trojan-go/config.json << END
 END
 
 # Installing Trojan Go Service
-cat > /etc/systemd/system/trojan-go.service << END
+cat >/etc/systemd/system/trojan-go.service <<END
 [Unit]
 Description=Trojan-Go Service Mod By SL
 Documentation=nekopoi.care
@@ -479,15 +490,15 @@ WantedBy=multi-user.target
 END
 
 # Trojan Go Uuid
-cat > /etc/trojan-go/uuid.txt << END
+cat >/etc/trojan-go/uuid.txt <<END
 $uuid
 END
 
 # restart
 iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 2086 -j ACCEPT
 iptables -I INPUT -m state --state NEW -m udp -p udp --dport 2087 -j ACCEPT
-iptables-save > /etc/iptables.up.rules
-iptables-restore -t < /etc/iptables.up.rules
+iptables-save >/etc/iptables.up.rules
+iptables-restore -t </etc/iptables.up.rules
 netfilter-persistent save
 netfilter-persistent reload
 systemctl daemon-reload

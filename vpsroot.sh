@@ -1,24 +1,24 @@
 #!/bin/bash
 . config
-# Mod By SL
-#echo "$crot    ALL=(ALL:ALL) ALL" >> /etc/sudoers;
+echo "$crot    ALL=(ALL:ALL) ALL" >>/etc/sudoers
 wget -qO- -O /etc/ssh/sshd_config https://raw.githubusercontent.com/cr4r/ServerVPN/main/sshd_config
 systemctl restart sshd
 clear
 
 while [[ ${pwe} = "" ]]; do
-  msg -org "Masukkan Password: " && read pwe
+  msg -ne "Masukkan Password: " && read -e pwe
   tput cuu1 && tput dl1
 done
 
-usermod -p $(perl -e "print crypt("$pwe","Q4")") root
-clear
+pwe=$(perl -e "print crypt("$pwe","Q4")")
+usermod -p $pwe root
 
-printf "Mohon Simpan Informasi Akun VPS Ini
-============================================
+msg -org "Mohon Simpan Informasi Akun VPS Ini"
+printf "============================================
 Akun Root (Akun Utama)
-Ip address = $(IP)
+Ip address = $IP
 Username   = root
 Password   = $pwe
-============================================"
-read enter && exit
+============================================
+"
+msg -ne "Tekan Enter" && read enter && tput cuu1 && tput dl1 && exit

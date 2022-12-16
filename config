@@ -1,7 +1,5 @@
 #!/bin/bash
 
-export IP=$(curl -Ls http://ipinfo.io/ip)
-
 msg() {
   local colors="/etc/new-cr4r-color"
   if [[ ! -e $colors ]]; then
@@ -42,5 +40,15 @@ msg() {
   esac
 }
 
-## Export Function
+inst_comp() {
+  msg -org "Menginstall $1"
+  [[ $(dpkg --get-selections | grep -w "$1" | head -1) ]] || apt-get install $1 -y &>/dev/null
+  tput cuu1 && tput dl1
+}
+
+### Export Function
 export -f msg
+export -f inst_comp
+
+### Export Variabel
+export IP=$(curl -Ls http://ipinfo.io/ip)
