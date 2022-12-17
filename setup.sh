@@ -73,7 +73,7 @@
 
 	msg -line " Install XRAY "
 	# . <(curl -s ${pxray}/ins-xray.sh) ### Sudah Fix
-sudo apt install python3-certbot-nginx -y 	. ${HomeRepo}/xray/ins-xray.sh
+	# sudo apt install python3-certbot-nginx -y . ${HomeRepo}/xray/ins-xray.sh
 
 	# wget ${pxray}/ins-xray.sh && chmod +x ins-xray.sh && screen -S xray ./ins-xray.sh
 
