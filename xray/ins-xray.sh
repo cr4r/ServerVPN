@@ -6,7 +6,6 @@
 NC='\033[0m'
 
 MYIP=$(wget -qO- ipinfo.io/ip)
-clear
 domain=$(cat /etc/xray/domain)
 
 install_all_component $(curl -Ls https://raw.githubusercontent.com/cr4r/ServerVPN/main/xray/plugin)
@@ -68,7 +67,7 @@ while [[ $konCert != @(s|S|y|Y|n|N|t|T) ]]; do
   tput cuu1 && tput dl1
 done
 
-if [[ $konCert == @(s|S|y|Y) ]]; then
+if [[ $konCert == @(n|N|t|T) ]]; then
   wget https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh
   bash acme.sh --install && rm acme.sh
   ln -s ~/.acme.sh/acme.sh /bin/acme
