@@ -20,7 +20,6 @@ domain=$(cat /etc/xray/domain)
 inst_components() {
   msg -ama "Menginstall plugin untuk xray yang diperlukan"
   plugin=$(curl -Ls https://raw.githubusercontent.com/cr4r/ServerVPN/main/xray/plugin)
-  bash <(curl -s https://raw.githubusercontent.com/cr4r/ServerVPN/main/coba)
   totalPlugin=$(wc -l <<<$plugin)
   nmr=1
 
