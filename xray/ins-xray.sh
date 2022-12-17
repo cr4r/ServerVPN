@@ -16,30 +16,34 @@ rm /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default &>/dev/nu
 msg -warn "Merestart nginx"
 systemctl restart nginx &>/dev/null
 
-ntpdate pool.ntp.org
-timedatectl set-ntp true
-systemctl enable chronyd && systemctl restart chronyd
-systemctl enable chrony && systemctl restart chrony
-timedatectl set-timezone Asia/Jakarta
-chronyc sourcestats -v
+msg -org "Update jam pada server"
+ntpdate pool.ntp.org &>/dev/null
+timedatectl set-ntp true &>/dev/null
+msg -org "systemctl enable chronyd && systemctl restart chronyd"
+systemctl enable chronyd &>/dev/null && systemctl restart chronyd &>/dev/null
+msg -org "systemctl enable chrony && systemctl restart chrony"
+systemctl enable chrony &>/dev/null && systemctl restart chrony &>/dev/null
+msg -org "timedatectl set-timezone Asia/Jakarta"
+timedatectl set-timezone Asia/Jakarta &>/dev/null
+msg -line "chronyc sourcestats"
+chronyc sourcestats -v &>/dev/null
+msg -line "chronyc tracking "
 chronyc tracking -v
-msg -org "${date}"
+msg -org "$(date)"
 
-# / / Ambil Xray Core Version Terbaru
+### Ambil Xray Core Version Terbaru
+### Installation Xray Core
 latest_version="$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases | grep tag_name | sed -E 's/.*"v(.*)".*/\1/' | head -n 1)"
-
-# / / Installation Xray Core
 xraycore_link="https://github.com/XTLS/Xray-core/releases/download/v$latest_version/xray-linux-64.zip"
 
-# / / Make Main Directory
+### Make Main Directory
 msg -org "Buat Folder /usr/bin/xray"
 msg -org "Buat Folder /etc/xray"
 mkdir -p /usr/bin/xray /etc/xray
 
 # / / Unzip Xray Linux 64
-msg -org ""
 loktmp=$(mktemp -d)
-cd $loktmp
+msg -org "${loktmp}"
 msg -org "Ke lokasi $loktmp"
 curl -sL "$xraycore_link" -o xray.zip
 msg -org "GET $xraycore_link ke $loktmp"
@@ -51,11 +55,11 @@ chmod +x /usr/local/bin/xray
 msg -org "chmod +x /usr/local/bin/xray"
 
 # # Make Folder XRay
-mkdir -p /var/log/xray/
 msg -org "mkdir -p /var/log/xray/"
+mkdir -p /var/log/xray/
 
-kill_port 80
 msg -org "kill_port 80"
+kill_port 80 &>/dev/null
 
 cd $home
 msg -gr "Cert digunakan untuk mendukung https dan ini wajib!!"

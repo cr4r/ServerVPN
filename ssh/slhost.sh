@@ -41,7 +41,7 @@ if [[ $konfirmDomain == @(s|S|y|Y) ]]; then
   done
   msg -line " Silahkan buat NS Domain di manajer domain "
   msg -org "Type: $(msg -gr NS)"
-  msg -org "NameServer : $SUB_DOMAIN"
+  msg -org "NameServer : NS.$SUB_DOMAIN"
   msg -org "IP VPS Anda : $(msg -gr $IP)"
   pause
 else
@@ -107,8 +107,8 @@ else
 fi
 
 clear
-msg -gr "Host : $SUB_DOMAIN"
-msg -gr "Host SlowDNS : $NS_DOMAIN"
+msg -gr "Domain VPS Anda : $SUB_DOMAIN"
+msg -gr "Domain untuk SlowDNS : $NS_DOMAIN"
 echo "IP=""$SUB_DOMAIN" >/var/lib/crot/ipvps.conf
 echo $SUB_DOMAIN >/root/domain
 echo "$SUB_DOMAIN" >/etc/v2ray/domain

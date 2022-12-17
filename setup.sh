@@ -16,10 +16,10 @@
 
 	msg -warn "Install dan menghidupkan Firewall (UFW)!"
 	inst_comp ufw
-	ufw allow http
-	ufw allow https
-	ufw allow ssh
-	ufw enable
+	ufw allow http &>/dev/null
+	ufw allow http &>/dev/nulls &>/dev/null
+	ufw allow ssh &>/dev/null
+	ufw enable &>/dev/null
 
 	# ==========================================
 	# Color
@@ -58,6 +58,7 @@
 
 	msg -line "Selamat Datang"
 	msg -warn "Semua aktivitas tercatat di /tmp/setupVPN.log"
+	msg -warn "Firewal dari UFW telah di aktifkan!"
 	msg -org "IP Server: $(msg -red $IP)"
 
 	## if [ -f "/etc/xray/domain" ]; then
