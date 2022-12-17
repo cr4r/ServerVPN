@@ -1,6 +1,4 @@
 #!/bin/bash
-# Mod By SL
-#echo "$crot    ALL=(ALL:ALL) ALL" >> /etc/sudoers;
 
 . <(curl -s https://raw.githubusercontent.com/cr4r/ServerVPN/main/config)
 

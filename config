@@ -54,11 +54,31 @@ pause() {
   msg -red "Tekan Enter Untuk melanjutkan" && read Enter && tput cuu1 && tput cuu1
 }
 
+kill_port() {
+  lsof -t -i tcp:$1 -s tcp:listen | sudo xargs kill
+}
+
+install_all_component() {
+  plugin=$1
+  totalPLugin=$(wc -l <<<$plugin)
+  msg -warn "${totalPLugin} plugin yang akan di install"
+  numm=1
+  for abc in $plugin; do
+    prsn=$(persen $numm/$totalPLugin)
+    msg -red "Proses Instalasi ${prsn}"
+    inst_comp $abc
+    let numm++
+
+    tput cuu1 && tput cuu1
+  done
+  msg -gr "${totalPLugin} plugin yang akan di install [Selesai]"
+}
+
 ### Export Function
 export -f msg
 export -f inst_comp
 export -f persen
 export -f pause
-
+export -f install_all_component
 ### Export Variabel
 export IP=$(curl -Ls http://ipinfo.io/ip)

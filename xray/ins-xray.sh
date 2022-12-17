@@ -9,20 +9,21 @@ MYIP=$(wget -qO- ipinfo.io/ip)
 clear
 domain=$(cat /etc/xray/domain)
 
-install_component() {
+install_all_component $(curl -Ls https://raw.githubusercontent.com/cr4r/ServerVPN/main/xray/plugin)
 
-  inst_comp
-}
+msg -warn "Menghapus default nginx"
+rm /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default &>/dev/null
+msg -warn "Merestart nginx"
+systemctl restart nginx &>/dev/null
 
 ntpdate pool.ntp.org
-apt -y install chrony
 timedatectl set-ntp true
 systemctl enable chronyd && systemctl restart chronyd
 systemctl enable chrony && systemctl restart chrony
 timedatectl set-timezone Asia/Jakarta
 chronyc sourcestats -v
 chronyc tracking -v
-date
+msg -org "${date}"
 
 # / / Ambil Xray Core Version Terbaru
 latest_version="$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases | grep tag_name | sed -E 's/.*"v(.*)".*/\1/' | head -n 1)"
@@ -31,29 +32,63 @@ latest_version="$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases |
 xraycore_link="https://github.com/XTLS/Xray-core/releases/download/v$latest_version/xray-linux-64.zip"
 
 # / / Make Main Directory
-mkdir -p /usr/bin/xray
-mkdir -p /etc/xray
+msg -org "Buat Folder /usr/bin/xray"
+msg -org "Buat Folder /etc/xray"
+mkdir -p /usr/bin/xray /etc/xray
 
 # / / Unzip Xray Linux 64
-cd $(mktemp -d)
+msg -org ""
+loktmp=$(mktemp -d)
+cd $loktmp
+msg -org "Ke lokasi $loktmp"
 curl -sL "$xraycore_link" -o xray.zip
+msg -org "GET $xraycore_link ke $loktmp"
 unzip -q xray.zip && rm -rf xray.zip
+msg -org "UNZIP $loktmp/xray.zip dan Hapus xray.zip"
 mv xray /usr/local/bin/xray
+msg -org "mv xray /usr/local/bin/xray"
 chmod +x /usr/local/bin/xray
+msg -org "chmod +x /usr/local/bin/xray"
 
-# Make Folder XRay
+# # Make Folder XRay
 mkdir -p /var/log/xray/
+msg -org "mkdir -p /var/log/xray/"
 
-sudo lsof -t -i tcp:80 -s tcp:listen | sudo xargs kill
-cd /root/
-wget https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh
-bash acme.sh --install
-rm acme.sh
-cd .acme.sh
-bash acme.sh --register-account -m senowahyu62@gmail.com
-bash acme.sh --issue --standalone -d $domain --force
-bash acme.sh --installcert -d $domain --fullchainpath /etc/xray/xray.crt --keypath /etc/xray/xray.key
+kill_port 80
+msg -org "kill_port 80"
 
+cd $home
+msg -gr "Cert digunakan untuk mendukung https dan ini wajib!!"
+while [[ $konCert != @(s|S|y|Y|n|N|t|T) ]]; do
+  msg -org "Apakah sudah ada cert untuk domain ? (Y/T)" && read konCert
+  tput cuu1 && tput dl1
+done
+
+if [[ $konCert == @(s|S|y|Y) ]]; then
+  wget https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh
+  bash acme.sh --install && rm acme.sh
+  ln -s ~/.acme.sh/acme.sh /bin/acme
+
+  acme --register-account -m cr4rrr@gmail.com
+  acme --issue --standalone -d $domain --force
+  acme --installcert -d $domain --fullchainpath /etc/xray/xray.crt --keypath /etc/xray/xray.key
+  cd $home
+  path_crt="/etc/xray/xray.crt"
+  path_key="/etc/xray/xray.key"
+else
+  while [[ $path_crt == "" ]]; do
+    # path_crt="/etc/xray/xray.crt"
+    # path_key="/etc/xray/xray.key"
+    msg -ne "Lokasi FullChain: " && read path_crt
+    tput cuu1 && tput dl1
+  done
+  while [[ $path_key == "" ]]; do
+    # path_crt="/etc/xray/xray.crt"
+    # path_key="/etc/xray/xray.key"
+    msg -ne "Lokasi FullChain: " && read path_key
+    tput cuu1 && tput dl1
+  done
+fi
 service squid start
 uuid7=$(cat /proc/sys/kernel/random/uuid)
 uuid1=$(cat /proc/sys/kernel/random/uuid)
@@ -63,11 +98,10 @@ uuid4=$(cat /proc/sys/kernel/random/uuid)
 uuid5=$(cat /proc/sys/kernel/random/uuid)
 uuid6=$(cat /proc/sys/kernel/random/uuid)
 
-# // Certificate File
-path_crt="/etc/xray/xray.crt"
-path_key="/etc/xray/xray.key"
-
-# Buat Config Xray
+### Buat Config Xray
+msg -line "Buat Config Xray"
+pathV2ray="/worryfree/"
+pathVless=$pathV2ray
 cat >/etc/xray/config.json <<END
 {
   "log": {
@@ -103,7 +137,7 @@ cat >/etc/xray/config.json <<END
         "kcpSettings": {},
         "httpSettings": {},
         "wsSettings": {
-          "path": "/vmess/",
+          "path": "${pathV2ray}",
           "headers": {
             "Host": ""
           }
@@ -132,7 +166,7 @@ cat >/etc/xray/config.json <<END
         "kcpSettings": {},
         "httpSettings": {},
         "wsSettings": {
-          "path": "/vmess/",
+          "path": "${pathV2ray}",
           "headers": {
             "Host": ""
           }
@@ -210,7 +244,7 @@ cat >/etc/xray/config.json <<END
         "kcpSettings": {},
         "httpSettings": {},
         "wsSettings": {
-          "path": "/vless/",
+          "path": "${pathVless}",
           "headers": {
             "Host": ""
           }
@@ -336,11 +370,14 @@ cat >/etc/xray/config.json <<END
 }
 END
 
-# / / Installation Xray Service
-cat >/etc/systemd/system/xray.service <<END
+### Installation Xray Service
+msg -warn "Installation Xray Service"
+msg -org "Buat File >/etc/systemd/system/xray.service"
+
+cat <<EOF >/etc/systemd/system/xray.service
 [Unit]
 Description=Xray Service Mod By SL
-Documentation=https://nekopoi.care
+Documentation=https://github.com/cr4r
 After=network.target nss-lookup.target
 
 [Service]
@@ -354,41 +391,52 @@ RestartPreventExitStatus=23
 
 [Install]
 WantedBy=multi-user.target
-END
+EOF
 
-# // Enable & Start Service
-# Accept port Xray
-iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 8443 -j ACCEPT
-iptables -I INPUT -m state --state NEW -m udp -p udp --dport 8443 -j ACCEPT
-iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
-iptables -I INPUT -m state --state NEW -m udp -p udp --dport 80 -j ACCEPT
-iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 2083 -j ACCEPT
-iptables -I INPUT -m state --state NEW -m udp -p udp --dport 2083 -j ACCEPT
-iptables-save >/etc/iptables.up.rules
-iptables-restore -t </etc/iptables.up.rules
-netfilter-persistent save
-netfilter-persistent reload
+### Menambahkan port pada ufw untuk xray
+# # Accept port Xray
+msg -warn "Menambahkan port pada ufw untuk xray!"
+ufw allow 8443/tcp
+ufw allow 8443/udp
+ufw allow 80/udp
+ufw allow 80/tcp &>/dev/null
+ufw allow 2083/udp
+ufw allow 2083/tcp
+
+msg -warn "Memulai service xray"
 systemctl daemon-reload
 systemctl stop xray.service
 systemctl start xray.service
 systemctl enable xray.service
 systemctl restart xray.service
 
-# Install Trojan Go
+### Install Trojan Go
+msg -line "Install Trojan Go"
 latest_version="$(curl -s "https://api.github.com/repos/p4gefau1t/trojan-go/releases" | grep tag_name | sed -E 's/.*"v(.*)".*/\1/' | head -n 1)"
 trojango_link="https://github.com/p4gefau1t/trojan-go/releases/download/v${latest_version}/trojan-go-linux-amd64.zip"
+msg -org "Membuat folder /usr/bin/trojan-go"
 mkdir -p "/usr/bin/trojan-go"
+msg -org "Membuat folder /etc/trojan-go"
 mkdir -p "/etc/trojan-go"
-cd $(mktemp -d)
-curl -sL "${trojango_link}" -o trojan-go.zip
-unzip -q trojan-go.zip && rm -rf trojan-go.zip
-mv trojan-go /usr/local/bin/trojan-go
-chmod +x /usr/local/bin/trojan-go
-mkdir /var/log/trojan-go/
-touch /etc/trojan-go/akun.conf
-touch /var/log/trojan-go/trojan-go.log
 
-# Buat Config Trojan Go
+loktemp=$(mktemp -d)
+msg -org "Menuju ke $loktemp"
+cd $(mktemp -d)
+msg -org "curl -sL "${trojango_link}" -o trojan-go.zip"
+curl -sL "${trojango_link}" -o trojan-go.zip
+msg -org "unzip -q trojan-go.zip && rm -rf trojan-go.zip"
+unzip -q trojan-go.zip && rm -rf trojan-go.zip
+msg -org "mv trojan-go /usr/local/bin/trojan-go"
+mv trojan-go /usr/local/bin/trojan-go
+msg -org "chmod +x /usr/local/bin/trojan-go"
+chmod +x /usr/local/bin/trojan-go
+msg -org "mkdir /var/log/trojan-go/"
+mkdir /var/log/trojan-go/
+msg -org "touch /etc/trojan-go/akun.conf /var/log/trojan-go/trojan-go.log"
+touch /etc/trojan-go/akun.conf /var/log/trojan-go/trojan-go.log
+
+msg -org "Membuat Config Trojan GO"
+# # Buat Config Trojan Go
 cat >/etc/trojan-go/config.json <<END
 {
   "run_type": "server",
@@ -453,10 +501,11 @@ cat >/etc/trojan-go/config.json <<END
 }
 END
 
-# Installing Trojan Go Service
+msg -org "Installing Trojan Go Service"
+### Installing Trojan Go Service
 cat >/etc/systemd/system/trojan-go.service <<END
 [Unit]
-Description=Trojan-Go Service Mod By SL
+Description=Trojan-Go Service Mod By cr4r
 Documentation=nekopoi.care
 After=network.target nss-lookup.target
 
@@ -478,18 +527,17 @@ cat >/etc/trojan-go/uuid.txt <<END
 $uuid
 END
 
-# restart
-iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 2086 -j ACCEPT
-iptables -I INPUT -m state --state NEW -m udp -p udp --dport 2087 -j ACCEPT
-iptables-save >/etc/iptables.up.rules
-iptables-restore -t </etc/iptables.up.rules
-netfilter-persistent save
-netfilter-persistent reload
+### restart
+msg -org "ufw allow port 2086/tcp"
+ufw allow 2086/tcp
+msg -org "ufw allow port 2087/udp"
+ufw allow 2087/udp
+msg -warn "Restart Service trojan GO"
 systemctl daemon-reload
 systemctl stop trojan-go
 systemctl start trojan-go
 systemctl enable trojan-go
 systemctl restart trojan-go
 
-cd
+cd $home
 cp /root/domain /etc/xray

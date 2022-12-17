@@ -1,5 +1,6 @@
 #!/bin/bash
-inst_comp jq curl -y &>/dev/null
+inst_comp jq &>/dev/null
+inst_comp curl &>/dev/null
 
 ### Initial
 rm -rf /root/domain &>/dev/null

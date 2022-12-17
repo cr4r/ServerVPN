@@ -12,3 +12,5 @@ socat
 cron
 bash-completion
 ntpdate
+chrony
+nginx
