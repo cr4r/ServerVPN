@@ -10,11 +10,6 @@ domain=$(cat /etc/xray/domain)
 
 install_all_component $(curl -Ls https://raw.githubusercontent.com/cr4r/ServerVPN/main/xray/plugin)
 
-msg -warn "Menghapus default nginx"
-rm /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default &>/dev/null
-msg -warn "Merestart nginx"
-systemctl restart nginx &>/dev/null
-
 msg -org "Update jam pada server"
 ntpdate pool.ntp.org &>/dev/null
 timedatectl set-ntp true &>/dev/null
@@ -46,7 +41,7 @@ msg -org "${loktmp}"
 msg -org "Ke lokasi $loktmp"
 curl -sL "$xraycore_link" -o xray.zip
 msg -org "GET $xraycore_link ke $loktmp"
-unzip -q xray.zip && rm -rf xray.zip
+unzip -oq xray.zip && rm -rf xray.zip
 msg -org "UNZIP $loktmp/xray.zip dan Hapus xray.zip"
 mv xray /usr/local/bin/xray
 msg -org "mv xray /usr/local/bin/xray"
@@ -59,6 +54,10 @@ mkdir -p /var/log/xray/
 
 msg -org "kill_port 80"
 kill_port 80 &>/dev/null
+msg -warn "Menghapus default nginx"
+rm /etc/nginx/sites-enabled/default &>/dev/null
+msg -warn "Merestart nginx"
+systemctl restart nginx &>/dev/null
 
 cd $home
 msg -gr "Cert digunakan untuk mendukung https dan ini wajib!!"
@@ -66,31 +65,49 @@ while [[ $konCert != @(s|S|y|Y|n|N|t|T) ]]; do
   msg -org "Apakah sudah ada cert untuk domain ? (Y/T)" && read konCert
   tput cuu1 && tput dl1
 done
-
-if [[ $konCert == @(n|N|t|T) ]]; then
-  wget https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh
-  bash acme.sh --install && rm acme.sh
-  ln -s ~/.acme.sh/acme.sh /bin/acme
-
-  acme --register-account -m cr4rrr@gmail.com
-  acme --issue --standalone -d $domain --force
-  acme --installcert -d $domain --fullchainpath /etc/xray/xray.crt --keypath /etc/xray/xray.key
-  cd $home
-  path_crt="/etc/xray/xray.crt"
-  path_key="/etc/xray/xray.key"
-else
+echo $konCert
+if [[ $konCert == @(s|S|y|Y) ]]; then
   while [[ $path_crt == "" ]]; do
-    # path_crt="/etc/xray/xray.crt"
-    # path_key="/etc/xray/xray.key"
     msg -ne "Lokasi FullChain: " && read path_crt
     tput cuu1 && tput dl1
   done
   while [[ $path_key == "" ]]; do
-    # path_crt="/etc/xray/xray.crt"
-    # path_key="/etc/xray/xray.key"
     msg -ne "Lokasi FullChain: " && read path_key
     tput cuu1 && tput dl1
   done
+else
+  mkdir -p /var/www
+  msg -red "Membuat config nginx untuk port 80"
+  cat <<EOF >/etc/nginx/sites-available/port80.conf
+server {
+  listen 80;
+  server_name $domain;
+  location / {
+      root /var/www
+  }
+EOF
+  ln -s /etc/nginx/sites-available/port80.conf /etc/nginx/sites-enable/port80.conf
+  nginx -t &>/dev/null
+  msg -warn "Merestart Nginx"
+  systemctl restart nginx &>/dev/null
+
+  msg -warn "Generate crt dan key di certbot"
+  sudo certbot --non-interactive --redirect --nginx -d $domain --agree-tos -m admin@$domain
+  path_crt="/etc/letsencrypt/live/$domain/fullchain.pem"
+  path_key="/etc/letsencrypt/live/$domain/privkey.pem"
+
+  ### Versi ACME
+  # wget https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh &>/dev/null
+  # msg -line "Membuat cert dari script acme.sh"
+  # bash acme.sh --install && rm acme.sh
+  # ln -s ~/.acme.sh/acme.sh /bin/acme
+
+  # acme --register-account -m cr4rrr@gmail.com
+  # acme --issue --standalone -d $domain --force
+  # acme --installcert -d $domain --fullchainpath /etc/xray/xray.crt --keypath /etc/xray/xray.key
+  # cd $home
+  # path_crt="/etc/xray/xray.crt"
+  # path_key="/etc/xray/xray.key"
 fi
 service squid start
 uuid7=$(cat /proc/sys/kernel/random/uuid)

@@ -14,3 +14,4 @@ bash-completion
 ntpdate
 chrony
 nginx
+python3-certbot-nginx

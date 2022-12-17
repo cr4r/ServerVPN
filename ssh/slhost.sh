@@ -41,7 +41,7 @@ if [[ $konfirmDomain == @(s|S|y|Y) ]]; then
   done
   msg -line " Silahkan buat NS Domain di manajer domain "
   msg -org "Type: $(msg -gr NS)"
-  msg -org "NameServer : NS.$SUB_DOMAIN"
+  msg -org "NameServer : ns.$SUB_DOMAIN"
   msg -org "IP VPS Anda : $(msg -gr $IP)"
   pause
 else

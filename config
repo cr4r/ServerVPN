@@ -82,3 +82,4 @@ export -f pause
 export -f install_all_component
 ### Export Variabel
 export IP=$(curl -Ls http://ipinfo.io/ip)
+export HomeRepo="/root/ServerVPN"
