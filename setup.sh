@@ -53,10 +53,15 @@ echo "Checking VPS"
 
 mkdir -p /var/lib/crot
 # echo "IP=" >>/var/lib/crot/ipvps.conf
-# . <(curl -s ${pssh}/slhost.sh)
-. ssh/slhost.sh
-# #install xray
+msg -line " Seting Domain VPS "
+# . <(curl -s ${pssh}/slhost.sh)		### Sudah Fix
+
+msg -line " Install XRAY "
+# . <(curl -s ${pxray}/ins-xray.sh) ### Belum Fix
+. xray/ins-xray.sh
+
 # wget ${pxray}/ins-xray.sh && chmod +x ins-xray.sh && screen -S xray ./ins-xray.sh
+
 # #install ssh ovpn
 # wget ${akbarvpn}/ssh-vpn.sh && chmod +x ssh-vpn.sh && screen -S ssh-vpn ./ssh-vpn.sh
 # wget ${psstp}/sstp.sh && chmod +x sstp.sh && screen -S sstp ./sstp.sh

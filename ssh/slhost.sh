@@ -113,3 +113,4 @@ echo $SUB_DOMAIN >/root/domain
 echo "$SUB_DOMAIN" >/etc/v2ray/domain
 echo "$NS_DOMAIN" >/root/nsdomain
 echo "$SUB_DOMAIN" >/etc/xray/domain
+pause
