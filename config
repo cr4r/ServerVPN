@@ -74,12 +74,31 @@ install_all_component() {
   msg -gr "${totalPLugin} plugin yang akan di install [Selesai]"
 }
 
+hapus_tool() {
+  ### SLHost
+  rm -rf /root/domain /etc/v2ray/domain /etc/xray/domain /etc/xray/domain /root/nsdomain /var/lib/crot/ipvps.conf /root/nsdomain /root/domain &>/dev/null
+  rm -rf /usr/bin/xray /usr/bin/v2ray /etc/xray /etc/v2ray /etc/v2ray/domain /root/nsdomain /etc/xray/domain /var/lib/crot/ipvps.conf &>/dev/null
+
+  ### XRAY
+  rm -rf /usr/bin/xray /etc/xray /var/log/xray/ /usr/local/bin/xray &>/dev/null
+  rm /etc/systemd/system/xray.service /etc/systemd/system/trojan-go.service &>/dev/null
+  systemctl disable xray.service &>/dev/null
+  systemctl stop xray.service &>/dev/null
+
+  ### Trojan-GO
+  rm -rf /usr/bin/trojan-go /etc/trojan-go /usr/local/bin/trojan-go /var/log/trojan-go/ &>/dev/null
+  systemctl disable trojan-go.service &>/dev/null
+  systemctl stop trojan-go.service &>/dev/null
+
+}
+
 ### Export Function
 export -f msg
 export -f inst_comp
 export -f persen
 export -f pause
 export -f install_all_component
+export -f hapus_tool
 ### Export Variabel
 export IP=$(curl -Ls http://ipinfo.io/ip)
 export HomeRepo="/root/ServerVPN"

@@ -69,11 +69,11 @@
 	mkdir -p /var/lib/crot
 	# echo "IP=" >>/var/lib/crot/ipvps.conf
 	# msg -line " Seting Domain VPS "
-	# . <(curl -s ${pssh}/slhost.sh) ### Sudah Fix
+	. <(curl -s ${pssh}/slhost.sh) ### Sudah Fix
 
 	msg -line " Install XRAY "
-	# . <(curl -s ${pxray}/ins-xray.sh) ### Sudah Fix
-	# sudo apt install python3-certbot-nginx -y . ${HomeRepo}/xray/ins-xray.sh
+	. <(curl -s ${pxray}/ins-xray.sh) ### Sudah Fix
+	# . ${HomeRepo}/xray/ins-xray.sh
 
 	# wget ${pxray}/ins-xray.sh && chmod +x ins-xray.sh && screen -S xray ./ins-xray.sh
 

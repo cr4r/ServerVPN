@@ -8,7 +8,7 @@ NC='\033[0m'
 MYIP=$(wget -qO- ipinfo.io/ip)
 domain=$(cat /etc/xray/domain)
 
-install_all_component $(curl -Ls https://raw.githubusercontent.com/cr4r/ServerVPN/main/xray/plugin)
+inst_comp $(curl -Ls https://raw.githubusercontent.com/cr4r/ServerVPN/main/xray/plugin)
 
 msg -org "Update jam pada server"
 ntpdate pool.ntp.org &>/dev/null
@@ -54,10 +54,13 @@ mkdir -p /var/log/xray/
 
 msg -org "kill_port 80"
 kill_port 80 &>/dev/null
-msg -warn "Menghapus default nginx"
-rm /etc/nginx/sites-enabled/default &>/dev/null
-msg -warn "Merestart nginx"
-systemctl restart nginx &>/dev/null
+
+if [[ -f /etc/nginx/sites-enable/default ]]; then
+  msg -warn "Menghapus default nginx"
+  rm /etc/nginx/sites-enabled/default &>/dev/null
+  msg -warn "Merestart nginx"
+  systemctl restart nginx &>/dev/null
+fi
 
 cd $home
 msg -gr "Cert digunakan untuk mendukung https dan ini wajib!!"
@@ -86,7 +89,7 @@ server {
       root /var/www
   }
 EOF
-  ln -s /etc/nginx/sites-available/port80.conf /etc/nginx/sites-enable/port80.conf
+  ln -s /etc/nginx/sites-available/port80.conf /etc/nginx/sites-enabled/port80.conf
   nginx -t &>/dev/null
   msg -warn "Merestart Nginx"
   systemctl restart nginx &>/dev/null
@@ -95,6 +98,8 @@ EOF
   sudo certbot --non-interactive --redirect --nginx -d $domain --agree-tos -m admin@$domain
   path_crt="/etc/letsencrypt/live/$domain/fullchain.pem"
   path_key="/etc/letsencrypt/live/$domain/privkey.pem"
+  rm /etc/nginx/sites-enabled/port80.conf &>/dev/null
+  systemctl restart nginx &>/dev/null
 
   ### Versi ACME
   # wget https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh &>/dev/null
@@ -109,7 +114,7 @@ EOF
   # path_crt="/etc/xray/xray.crt"
   # path_key="/etc/xray/xray.key"
 fi
-service squid start
+service squid start &>/dev/null
 uuid7=$(cat /proc/sys/kernel/random/uuid)
 uuid1=$(cat /proc/sys/kernel/random/uuid)
 uuid2=$(cat /proc/sys/kernel/random/uuid)
@@ -426,8 +431,8 @@ ufw allow 2083/tcp
 msg -warn "Memulai service xray"
 systemctl daemon-reload
 systemctl stop xray.service
-systemctl start xray.service
 systemctl enable xray.service
+systemctl start xray.service
 systemctl restart xray.service
 
 ### Install Trojan Go
@@ -444,8 +449,8 @@ msg -org "Menuju ke $loktemp"
 cd $(mktemp -d)
 msg -org "curl -sL "${trojango_link}" -o trojan-go.zip"
 curl -sL "${trojango_link}" -o trojan-go.zip
-msg -org "unzip -q trojan-go.zip && rm -rf trojan-go.zip"
-unzip -q trojan-go.zip && rm -rf trojan-go.zip
+msg -org "unzip -qo trojan-go.zip && rm -rf trojan-go.zip"
+unzip -qo trojan-go.zip && rm -rf trojan-go.zip
 msg -org "mv trojan-go /usr/local/bin/trojan-go"
 mv trojan-go /usr/local/bin/trojan-go
 msg -org "chmod +x /usr/local/bin/trojan-go"
