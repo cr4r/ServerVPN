@@ -50,10 +50,15 @@ persen() {
   printf %.2f%% "$((10 ** 6 * $@))e-4"
 }
 
+pause() {
+  msg -red "Tekan Enter Untuk melanjutkan" && read Enter && tput cuu1 && tput cuu1
+}
+
 ### Export Function
 export -f msg
 export -f inst_comp
 export -f persen
+export -f pause
 
 ### Export Variabel
 export IP=$(curl -Ls http://ipinfo.io/ip)

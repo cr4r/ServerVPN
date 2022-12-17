@@ -46,14 +46,15 @@ pohp="https://raw.githubusercontent.com/cr4r/ServerVPN/main/ohp"
 clear
 echo "Checking VPS"
 
-# if [ -f "/etc/xray/domain" ]; then
-# 	echo "Script Already Installed"
-# 	exit 0
-# fi
+## if [ -f "/etc/xray/domain" ]; then
+## 	echo "Script Already Installed"
+## 	exit 0
+## fi
 
 mkdir -p /var/lib/crot
 # echo "IP=" >>/var/lib/crot/ipvps.conf
-. <(curl -s ${pssh}/slhost.sh)
+# . <(curl -s ${pssh}/slhost.sh)
+. ssh/slhost.sh
 # #install xray
 # wget ${pxray}/ins-xray.sh && chmod +x ins-xray.sh && screen -S xray ./ins-xray.sh
 # #install ssh ovpn
