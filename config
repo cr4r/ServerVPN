@@ -90,6 +90,9 @@ hapus_tool() {
   systemctl disable trojan-go.service &>/dev/null
   systemctl stop trojan-go.service &>/dev/null
 
+  ### Nginx port
+  rm /etc/nginx/sites-enabled/port80.conf &>/dev/null
+
 }
 
 ### Export Function

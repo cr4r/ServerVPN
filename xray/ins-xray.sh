@@ -86,8 +86,9 @@ server {
   listen 80;
   server_name $domain;
   location / {
-      root /var/www
+      root /var/www;
   }
+}
 EOF
   ln -s /etc/nginx/sites-available/port80.conf /etc/nginx/sites-enabled/port80.conf
   nginx -t &>/dev/null
