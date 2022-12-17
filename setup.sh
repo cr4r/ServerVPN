@@ -33,26 +33,29 @@
 	LIGHT='\033[0;37m'
 	# ==========================================
 	# Link Hosting Kalian Untuk Ssh Vpn
-	pssh="https://raw.githubusercontent.com/cr4r/ServerVPN/main/ssh"
+	export pssh="https://raw.githubusercontent.com/cr4r/ServerVPN/main/ssh"
 	# Link Hosting Kalian Untuk Sstp
-	psstp="https://raw.githubusercontent.com/cr4r/ServerVPN/main/sstp"
+	export psstp="https://raw.githubusercontent.com/cr4r/ServerVPN/main/sstp"
 	# Link Hosting Kalian Untuk Ssr
-	pssr="https://raw.githubusercontent.com/cr4r/ServerVPN/main/ssr"
+	export pssr="https://raw.githubusercontent.com/cr4r/ServerVPN/main/ssr"
 	# Link Hosting Kalian Untuk Shadowsocks
-	psocks="https://raw.githubusercontent.com/cr4r/ServerVPN/main/shadowsocks"
+	export psocks="https://raw.githubusercontent.com/cr4r/ServerVPN/main/shadowsocks"
 	# Link Hosting Kalian Untuk Wireguard
-	pwrguard="https://raw.githubusercontent.com/cr4r/ServerVPN/main/wireguard"
+	export pwrguard="https://raw.githubusercontent.com/cr4r/ServerVPN/main/wireguard"
 	# Link Hosting Kalian Untuk Xray
-	pxray="https://raw.githubusercontent.com/cr4r/ServerVPN/main/xray"
+	export pxray="https://raw.githubusercontent.com/cr4r/ServerVPN/main/xray"
 	# Link Hosting Kalian Untuk Ipsec
-	pipsec="https://raw.githubusercontent.com/cr4r/ServerVPN/main/ipsec"
+	export pipsec="https://raw.githubusercontent.com/cr4r/ServerVPN/main/ipsec"
 	# Link Hosting Kalian Untuk Backup
-	pbackup="https://raw.githubusercontent.com/cr4r/ServerVPN/main/backup"
+	export pbackup="https://raw.githubusercontent.com/cr4r/ServerVPN/main/backup"
 	# Link Hosting Kalian Untuk Websocket
-	pwst="https://raw.githubusercontent.com/cr4r/ServerVPN/main/websocket"
+	export pwst="https://raw.githubusercontent.com/cr4r/ServerVPN/main/websocket"
 	# Link Hosting Kalian Untuk Ohp
-	pohp="https://raw.githubusercontent.com/cr4r/ServerVPN/main/ohp"
-
+	export pohp="https://raw.githubusercontent.com/cr4r/ServerVPN/main/ohp"
+	# Link Hosting Kalian Untuk trojan-go
+	export ptrojango="raw.githubusercontent.com/cr4r/ServerVPN/main/trojango"
+	# Link Hosting Kalian Untuk stunnel5
+	export pstunnel5="raw.githubusercontent.com/cr4r/ServerVPN/main/stunnel5"
 	# Getting
 	clear
 
@@ -70,15 +73,17 @@
 	# echo "IP=" >>/var/lib/crot/ipvps.conf
 	# msg -line " Seting Domain VPS "
 	. <(curl -s ${pssh}/slhost.sh) ### Sudah Fix
+	# . ${HomeRepo}/ssh/slhost.sh
 
 	msg -line " Install XRAY "
 	. <(curl -s ${pxray}/ins-xray.sh) ### Sudah Fix
 	# . ${HomeRepo}/xray/ins-xray.sh
 
-	# wget ${pxray}/ins-xray.sh && chmod +x ins-xray.sh && screen -S xray ./ins-xray.sh
-
 	# #install ssh ovpn
-	# wget ${akbarvpn}/ssh-vpn.sh && chmod +x ssh-vpn.sh && screen -S ssh-vpn ./ssh-vpn.sh
+	msg -line " Install ssh ovpn "
+	# . <(curl -s ${pssh}/ssh-vpn.sh) ### Belum Fix
+	. ${HomeRepo}/ssh/ssh-vpn.sh
+
 	# wget ${psstp}/sstp.sh && chmod +x sstp.sh && screen -S sstp ./sstp.sh
 	# #install ssr
 	# wget ${pssr}/ssr.sh && chmod +x ssr.sh && screen -S ssr ./ssr.sh
