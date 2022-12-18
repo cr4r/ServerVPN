@@ -110,4 +110,5 @@ export -f hapus_tool
 export IP=$(curl -Ls http://ipinfo.io/ip)
 export HomeRepo="/root/ServerVPN"
 
-export home=/root/LogServerVPN
+export home="/root/LogServerVPN"
+export urlFile="https://raw.githubusercontent.com/cr4r/ServerVPN"

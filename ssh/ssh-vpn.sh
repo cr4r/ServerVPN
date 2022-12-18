@@ -72,7 +72,7 @@ sed -i '$ i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
 msg -red "Sedang memperbarui system"
 update &>/dev/null
 
-install_all_component $(curl -Ls https://raw.githubusercontent.com/cr4r/ServerVPN/main/xray/plugin)
+install_all_component $(curl -Ls $urlFile/main/ssh/plugin)
 
 ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
 
