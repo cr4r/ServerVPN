@@ -9,10 +9,10 @@
 		exit 1
 	fi
 
-	export home=/root/LogServerVPN
-	mkdir -p $home && cd $home
+	echo "sudo apt-get update&&sudo apt-get upgrade -y&&sudo apt-get dist-upgrade -y&&sudo apt-get autoremove -y" >/bin/update && sudo chmod 777 /bin/update
 
 	. <(curl -s https://raw.githubusercontent.com/cr4r/ServerVPN/main/config)
+	mkdir -p $home && cd $home
 
 	msg -warn "Install dan menghidupkan Firewall (UFW)!"
 	inst_comp ufw
@@ -72,12 +72,12 @@
 	mkdir -p /var/lib/crot
 	# echo "IP=" >>/var/lib/crot/ipvps.conf
 	# msg -line " Seting Domain VPS "
-	. <(curl -s ${pssh}/slhost.sh) ### Sudah Fix
-	# . ${HomeRepo}/ssh/slhost.sh
+	# . <(curl -s ${pssh}/slhost.sh) ### Sudah Fix
+	# # . ${HomeRepo}/ssh/slhost.sh
 
-	msg -line " Install XRAY "
-	. <(curl -s ${pxray}/ins-xray.sh) ### Sudah Fix
-	# . ${HomeRepo}/xray/ins-xray.sh
+	# msg -line " Install XRAY "
+	# . <(curl -s ${pxray}/ins-xray.sh) ### Sudah Fix
+	# # . ${HomeRepo}/xray/ins-xray.sh
 
 	# #install ssh ovpn
 	msg -line " Install ssh ovpn "

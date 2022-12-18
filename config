@@ -61,17 +61,21 @@ kill_port() {
 install_all_component() {
   plugin=$1
   totalPLugin=$(wc -l <<<$plugin)
-  msg -warn "${totalPLugin} plugin yang akan di install"
-  numm=1
-  for abc in $plugin; do
-    prsn=$(persen $numm/$totalPLugin)
-    msg -red "Proses Instalasi ${prsn}"
-    inst_comp $abc
-    let numm++
+  if [[ $totalPLugin == 0 ]]; then
+    msg -red "Tidak ada plugin yang di install"
+  else
+    msg -warn "${totalPLugin} plugin yang akan di install"
+    numm=1
+    for abc in $plugin; do
+      prsn=$(persen $numm/$totalPLugin)
+      msg -red "Proses Instalasi ${prsn}"
+      inst_comp $abc
+      let numm++
 
-    tput cuu1 && tput cuu1
-  done
-  msg -gr "${totalPLugin} plugin yang akan di install [Selesai]"
+      tput cuu1 && tput cuu1
+    done
+    msg -gr "${totalPLugin} plugin yang akan di install [Selesai]"
+  fi
 }
 
 hapus_tool() {
@@ -105,3 +109,5 @@ export -f hapus_tool
 ### Export Variabel
 export IP=$(curl -Ls http://ipinfo.io/ip)
 export HomeRepo="/root/ServerVPN"
+
+export home=/root/LogServerVPN

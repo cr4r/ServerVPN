@@ -8,7 +8,7 @@ NC='\033[0m'
 MYIP=$(wget -qO- ipinfo.io/ip)
 domain=$(cat /etc/xray/domain)
 
-inst_comp $(curl -Ls https://raw.githubusercontent.com/cr4r/ServerVPN/main/xray/plugin)
+install_all_component $(curl -Ls https://raw.githubusercontent.com/cr4r/ServerVPN/main/xray/plugin)
 
 msg -org "Update jam pada server"
 ntpdate pool.ntp.org &>/dev/null
