@@ -81,7 +81,7 @@ install_all_component() {
 
 hapus_tool() {
   ### SLHost
-  rm -rf /root/domain /etc/v2ray/domain /etc/xray/domain /etc/xray/domain /root/nsdomain /var/lib/crot/ipvps.conf /root/nsdomain /root/domain &>/dev/null
+  rm -rf /root/domain /etc/v2ray/domain /etc/xray/domain /etc/xray/domain /root/nsdomain /var/lib/crot/ipvps.conf /root/nsdomain /root/domain /etc/slowdns &>/dev/null
   rm -rf /usr/bin/xray /usr/bin/v2ray /etc/xray /etc/v2ray /etc/v2ray/domain /root/nsdomain /etc/xray/domain /var/lib/crot/ipvps.conf &>/dev/null
 
   ### XRAY
@@ -114,12 +114,12 @@ export -f pause
 export -f install_all_component
 export -f hapus_tool
 ### Export Variabel
-export IP=$(curl -Ls http://ipinfo.io/ip)
 export HomeRepo="/root/ServerVPN"
-
-export home="/root/LogServerVPN"
-export urlFile="https://raw.githubusercontent.com/cr4r/ServerVPN"
-export NET=$(ip -o $ANU -4 route show to default | awk '{print $5}')
 export dir_slh="/etc/slowdns"
 export dir_v2ray="/etc/v2ray"
 export dir_xray="/etc/xray"
+export home="/root/LogServerVPN"
+
+export IP=$(curl -Ls http://ipinfo.io/ip)
+export urlFile="https://raw.githubusercontent.com/cr4r/ServerVPN"
+export NET=$(ip -o $ANU -4 route show to default | awk '{print $5}')

@@ -19,10 +19,10 @@ msg -org "systemctl enable chrony && systemctl restart chrony"
 systemctl enable chrony &>/dev/null && systemctl restart chrony &>/dev/null
 msg -org "timedatectl set-timezone Asia/Jakarta"
 timedatectl set-timezone Asia/Jakarta &>/dev/null
-msg -line "chronyc sourcestats"
+msg -org "chronyc sourcestats"
 chronyc sourcestats -v &>/dev/null
-msg -line "chronyc tracking "
-chronyc tracking -v
+msg -org "chronyc tracking "
+chronyc tracking -v &>/dev/null
 msg -org "$(date)"
 
 ### Ambil Xray Core Version Terbaru
@@ -96,7 +96,7 @@ EOF
   systemctl restart nginx &>/dev/null
 
   msg -warn "Generate crt dan key di certbot"
-  sudo certbot --non-interactive --redirect --nginx -d $domain --agree-tos -m admin@$domain
+  certbot --non-interactive --redirect --nginx -d $domain --agree-tos -m admin@$domain
   path_crt="/etc/letsencrypt/live/$domain/fullchain.pem"
   path_key="/etc/letsencrypt/live/$domain/privkey.pem"
   rm /etc/nginx/sites-enabled/port80.conf &>/dev/null
@@ -125,9 +125,12 @@ uuid5=$(cat /proc/sys/kernel/random/uuid)
 uuid6=$(cat /proc/sys/kernel/random/uuid)
 
 ### Buat Config Xray
-msg -line "Buat Config Xray"
+msg -line " Buat Config Xray "
 pathV2ray="/worryfree/"
 pathVless=$pathV2ray
+portTLS=8443
+portNonTLS=8444
+portFallBack=8445
 cat >/etc/xray/config.json <<END
 {
   "log": {
@@ -137,7 +140,7 @@ cat >/etc/xray/config.json <<END
   },
   "inbounds": [
     {
-      "port": 8443,
+      "port": ${portTLS},
       "protocol": "vmess",
       "settings": {
         "clients": [
@@ -172,7 +175,7 @@ cat >/etc/xray/config.json <<END
       }
     },
     {
-      "port": 80,
+      "port": ${portNonTLS},
       "protocol": "vmess",
       "settings": {
         "clients": [
@@ -208,7 +211,7 @@ cat >/etc/xray/config.json <<END
       }
     },
     {
-      "port": 8443,
+      "port": ${portTLS},
       "protocol": "vless",
       "settings": {
         "clients": [
@@ -251,7 +254,7 @@ cat >/etc/xray/config.json <<END
       }
     },
     {
-      "port": 80,
+      "port": ${portNonTLS},
       "protocol": "vless",
       "settings": {
         "clients": [
@@ -286,7 +289,7 @@ cat >/etc/xray/config.json <<END
       }
     },
     {
-      "port": 2083,
+      "port": ${portFallBack},
       "protocol": "trojan",
       "settings": {
         "clients": [
@@ -422,12 +425,12 @@ EOF
 ### Menambahkan port pada ufw untuk xray
 # # Accept port Xray
 msg -warn "Menambahkan port pada ufw untuk xray!"
-ufw allow 8443/tcp
-ufw allow 8443/udp
-ufw allow 80/udp
-ufw allow 80/tcp &>/dev/null
-ufw allow 2083/udp
-ufw allow 2083/tcp
+ufw allow ${portTLS}/tcp
+ufw allow ${portTLS}/udp
+ufw allow ${portNonTLS}/udp
+ufw allow ${portNonTLS}/tcp &>/dev/null
+ufw allow ${portFallBack}/udp
+ufw allow ${portFallBack}/tcp
 
 msg -warn "Memulai service xray"
 systemctl daemon-reload
@@ -565,5 +568,10 @@ systemctl start trojan-go
 systemctl enable trojan-go
 systemctl restart trojan-go
 
-cd $home
-cp /root/domain /etc/xray
+msg -line " Instalasi Xray dan Trojan Go Selesai! "
+msg -line " Informasi tentang Xray "
+msg -warn "VMESS"
+msg -org "Servername : $(cat ${dir_xray}/domain)"
+msg -org "Port TLS : ${portTLS}"
+msg -org "Port TLS : ${portNonTLS}"
+msg -org "Port FallBack: ${portFallBack}"

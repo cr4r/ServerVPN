@@ -113,6 +113,6 @@ msg -gr "Domain untuk SlowDNS : $NS_DOMAIN"
 echo "IP=""$SUB_DOMAIN" >/var/lib/crot/ipvps.conf
 echo $SUB_DOMAIN >$home
 echo "$SUB_DOMAIN" >/etc/v2ray/domain
-echo "$NS_DOMAIN" >/etc/slowdns/nsdomain
 echo "$SUB_DOMAIN" >/etc/xray/domain
+echo "$NS_DOMAIN" >/etc/slowdns/nsdomain
 pause
