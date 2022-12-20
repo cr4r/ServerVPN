@@ -2,19 +2,19 @@
 # ==========================================
 
 sleep 20
-systemctl stop ws-tls 
-pkill python
-systemctl stop sslh
-systemctl daemon-reload
-systemctl disable ws-tls
-systemctl disable sslh
-systemctl daemon-reload
-systemctl enable sslh
-systemctl enable ws-tls
-systemctl start sslh 
-/etc/init.d/sslh start 
-/etc/init.d/sslh restart 
-systemctl start ws-tls
+systemctl stop ws-tls &>/dev/null
+pkill python &>/dev/null
+systemctl stop sslh &>/dev/null
+systemctl daemon-reload &>/dev/null
+systemctl disable ws-tls &>/dev/null
+systemctl disable sslh &>/dev/null
+systemctl daemon-reload &>/dev/null
+systemctl enable sslh &>/dev/null
+systemctl enable ws-tls &>/dev/null
+systemctl start sslh &>/dev/null
+/etc/init.d/sslh start &>/dev/null
+/etc/init.d/sslh restart &>/dev/null
+systemctl start ws-tls &>/dev/null
 systemctl restart ws-tls
-sleep 20
+echo "Restart semua service"
 restart

@@ -5,37 +5,38 @@
 cd $home
 nameserver=$(cat /root/nsdomain)
 install_all_component $(curl -Ls ${psldns}/plugin)
-service cron reload
-service cron restart
+service cron reload &>/dev/null
+service cron restart &>/dev/null
 #sl-fix
 cd /usr/bin
-wget -O sl-fix "https://raw.githubusercontent.com/fisabiliyusri/Mantap/main/sslh-fix/sl-fix"
+wget -O sl-fix "https://raw.githubusercontent.com/fisabiliyusri/Mantap/main/sslh-fix/sl-fix"&>/dev/null
 chmod +x sl-fix
 sl-fix
-cd
+cd $home
+msg -warn "Menambahkan port 3369 dan 2269 di /etc/ssh/sshd_config"
 echo "Port 3369" >>/etc/ssh/sshd_config
 echo "Port 2269" >>/etc/ssh/sshd_config
 sed -i 's/#AllowTcpForwarding yes/AllowTcpForwarding yes/g' /etc/ssh/sshd_config
-rm -rf /etc/slowdns
-mkdir -m 777 /etc/slowdns
-wget -q -O /etc/slowdns/server.key "https://raw.githubusercontent.com/fisabiliyusri/SLDNS/main/slowdns/server.key"
-wget -q -O /etc/slowdns/server.pub "https://raw.githubusercontent.com/fisabiliyusri/SLDNS/main/slowdns/server.pub"
-wget -q -O /etc/slowdns/sldns-server "https://raw.githubusercontent.com/fisabiliyusri/SLDNS/main/slowdns/sldns-server"
-wget -q -O /etc/slowdns/sldns-client "https://raw.githubusercontent.com/fisabiliyusri/SLDNS/main/slowdns/sldns-client"
-cd
-chmod +x /etc/slowdns/server.key
-chmod +x /etc/slowdns/server.pub
-chmod +x /etc/slowdns/sldns-server
-chmod +x /etc/slowdns/sldns-client
-cd
+rm -rf ${dir_slh}
+mkdir -m 777 ${dir_slh}
+wget -q -O ${dir_slh}/server.key "${psldns}/slowdns/server.key"
+wget -q -O ${dir_slh}/server.pub "${psldns}/slowdns/server.pub"
+wget -q -O ${dir_slh}/sldns-server "${psldns}/slowdns/sldns-server"
+wget -q -O ${dir_slh}/sldns-client "${psldns}/slowdns/sldns-client"
+cd $home
+chmod +x ${dir_slh}/server.key
+chmod +x ${dir_slh}/server.pub
+chmod +x ${dir_slh}/sldns-server
+chmod +x ${dir_slh}/sldns-client
+cd $home
 #wget -q -O /etc/systemd/system/client-sldns.service "https://raw.githubusercontent.com/fisabiliyusri/SLDNS/main/slowdns/client-sldns.service"
 #wget -q -O /etc/systemd/system/server-sldns.service "https://raw.githubusercontent.com/fisabiliyusri/SLDNS/main/slowdns/server-sldns.service"
-cd
+cd $home
 #install client-sldns.service
 cat >/etc/systemd/system/client-sldns.service <<END
 [Unit]
 Description=Client SlowDNS By SL
-Documentation=https://nekopoi.care
+Documentation=https://github.com/cr4r
 After=network.target nss-lookup.target
 
 [Service]
@@ -44,7 +45,7 @@ User=root
 CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 NoNewPrivileges=true
-ExecStart=/etc/slowdns/sldns-client -udp 8.8.8.8:53 --pubkey-file /etc/slowdns/server.pub $nameserver 127.0.0.1:3369
+ExecStart=${dir_slh}/sldns-client -udp 8.8.8.8:53 --pubkey-file ${dir_slh}/server.pub $nameserver 127.0.0.1:3369
 Restart=on-failure
 
 [Install]
@@ -55,7 +56,7 @@ cd
 cat >/etc/systemd/system/server-sldns.service <<END
 [Unit]
 Description=Server SlowDNS By SL
-Documentation=https://nekopoi.care
+Documentation=https://github.com/cr4r
 After=network.target nss-lookup.target
 
 [Service]
@@ -64,24 +65,27 @@ User=root
 CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 NoNewPrivileges=true
-ExecStart=/etc/slowdns/sldns-server -udp :5300 -privkey-file /etc/slowdns/server.key $nameserver 127.0.0.1:2269
+ExecStart=${dir_slh}/sldns-server -udp :5300 -privkey-file ${dir_slh}/server.key $nameserver 127.0.0.1:2269
 Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
 END
-cd
-chmod +x /etc/systemd/system/client-sldns.service
-chmod +x /etc/systemd/system/server-sldns.service
-pkill sldns-server
-pkill sldns-client
-systemctl daemon-reload
-systemctl stop client-sldns
-systemctl stop server-sldns
-systemctl enable client-sldns
-systemctl enable server-sldns
-systemctl start client-sldns
-systemctl start server-sldns
-systemctl restart client-sldns
-systemctl restart server-sldns
-cd
+cd $home
+
+msg -warn "Menghidupkan server dan client pada sldns"
+chmod +x /etc/systemd/system/client-sldns.service &>/dev/null
+chmod +x /etc/systemd/system/server-sldns.service &>/dev/null
+pkill sldns-server &>/dev/null
+pkill sldns-client &>/dev/null
+systemctl daemon-reload &>/dev/null
+systemctl stop client-sldns &>/dev/null
+systemctl stop server-sldns &>/dev/null
+systemctl enable client-sldns &>/dev/null
+systemctl enable server-sldns &>/dev/null
+systemctl start client-sldns &>/dev/null
+systemctl start server-sldns &>/dev/null
+systemctl restart client-sldns &>/dev/null
+systemctl restart server-sldns &>/dev/null
+cd $home
+msg -red "Port SLDNS: 5300"

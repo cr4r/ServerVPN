@@ -8,8 +8,7 @@ NC='\033[0m'
 MYIP=$(wget -qO- ipinfo.io/ip)
 domain=$(cat /etc/xray/domain)
 
-install_all_component $(curl -Ls https://raw.githubusercontent.com/cr4r/ServerVPN/main/xray/plugin)
-
+install_all_component $(curl -Ls https://raw.githubusercontent.com/cr4r/ServerVPN/main/xray/plugin) && tput cuu1
 msg -org "Update jam pada server"
 ntpdate pool.ntp.org &>/dev/null
 timedatectl set-ntp true &>/dev/null
@@ -65,7 +64,7 @@ fi
 cd $home
 msg -gr "Cert digunakan untuk mendukung https dan ini wajib!!"
 while [[ $konCert != @(s|S|y|Y|n|N|t|T) ]]; do
-  msg -org "Apakah sudah ada cert untuk domain ? (Y/T)" && read konCert
+  msg -ne "Apakah sudah ada cert untuk domain ? (Y/T)" && read konCert
   tput cuu1 && tput dl1
 done
 echo $konCert
@@ -450,7 +449,7 @@ mkdir -p "/etc/trojan-go"
 
 loktemp=$(mktemp -d)
 msg -org "Menuju ke $loktemp"
-cd $(mktemp -d)
+cd ${loktemp}
 msg -org "curl -sL "${trojango_link}" -o trojan-go.zip"
 curl -sL "${trojango_link}" -o trojan-go.zip
 msg -org "unzip -qo trojan-go.zip && rm -rf trojan-go.zip"
@@ -471,7 +470,7 @@ cat >/etc/trojan-go/config.json <<END
 {
   "run_type": "server",
   "local_addr": "0.0.0.0",
-  "local_port": 2087,
+  "local_port": 2086,
   "remote_addr": "127.0.0.1",
   "remote_port": 89,
   "log_level": 1,
@@ -558,10 +557,7 @@ $uuid
 END
 
 ### restart
-msg -org "ufw allow port 2086/tcp"
-ufw allow 2086/tcp &>/dev/null
-msg -org "ufw allow port 2087/udp"
-ufw allow 2087/udp &>/dev/null
+msg -org "ufw allow port 89"
 ufw allow 89 &>/dev/null
 msg -warn "Restart Service trojan GO"
 systemctl daemon-reload &>/dev/null
@@ -577,3 +573,7 @@ msg -org "Servername : $(cat ${dir_xray}/domain)"
 msg -org "Port TLS : ${portTLS}"
 msg -org "Port TLS : ${portNonTLS}"
 msg -org "Port FallBack: ${portFallBack}"
+msg -line
+msg -warn "VMESS"
+msg -org "Servername : $(cat ${dir_xray}/domain)"
+msg -org "Port : 89"

@@ -20,6 +20,7 @@ systemctl start sslh
 systemctl restart sslh
 /etc/init.d/sslh start
 /etc/init.d/sslh restart
+
 systemctl restart ssrmu
 systemctl restart ws-tls
 systemctl restart ws-nontls
@@ -37,6 +38,7 @@ systemctl restart ssh-ohp
 systemctl restart dropbear-ohp
 systemctl restart openvpn-ohp
 systemctl restart trojan-go
+
 /etc/init.d/ssrmu restart
 /etc/init.d/ssh restart
 /etc/init.d/dropbear restart
@@ -48,6 +50,7 @@ systemctl restart trojan-go
 /etc/init.d/cron restart
 /etc/init.d/nginx restart
 /etc/init.d/squid restart
+
 screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7100 --max-clients 1000
 screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7200 --max-clients 1000
 screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7300 --max-clients 1000
