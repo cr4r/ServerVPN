@@ -425,12 +425,12 @@ EOF
 ### Menambahkan port pada ufw untuk xray
 # # Accept port Xray
 msg -warn "Menambahkan port pada ufw untuk xray!"
-ufw allow ${portTLS}/tcp
-ufw allow ${portTLS}/udp
-ufw allow ${portNonTLS}/udp
+ufw allow ${portTLS}/tcp &>/dev/null
+ufw allow ${portTLS}/udp &>/dev/null
+ufw allow ${portNonTLS}/udp &>/dev/null
 ufw allow ${portNonTLS}/tcp &>/dev/null
-ufw allow ${portFallBack}/udp
-ufw allow ${portFallBack}/tcp
+ufw allow ${portFallBack}/udp &>/dev/null
+ufw allow ${portFallBack}/tcp &>/dev/null
 
 msg -warn "Memulai service xray"
 systemctl daemon-reload
@@ -466,6 +466,7 @@ touch /etc/trojan-go/akun.conf /var/log/trojan-go/trojan-go.log
 
 msg -org "Membuat Config Trojan GO"
 # # Buat Config Trojan Go
+
 cat >/etc/trojan-go/config.json <<END
 {
   "run_type": "server",
@@ -558,15 +559,16 @@ END
 
 ### restart
 msg -org "ufw allow port 2086/tcp"
-ufw allow 2086/tcp
+ufw allow 2086/tcp &>/dev/null
 msg -org "ufw allow port 2087/udp"
-ufw allow 2087/udp
+ufw allow 2087/udp &>/dev/null
+ufw allow 89 &>/dev/null
 msg -warn "Restart Service trojan GO"
-systemctl daemon-reload
-systemctl stop trojan-go
-systemctl start trojan-go
-systemctl enable trojan-go
-systemctl restart trojan-go
+systemctl daemon-reload &>/dev/null
+systemctl stop trojan-go &>/dev/null
+systemctl start trojan-go &>/dev/null
+systemctl enable trojan-go &>/dev/null
+systemctl restart trojan-go &>/dev/null
 
 msg -line " Instalasi Xray dan Trojan Go Selesai! "
 msg -line " Informasi tentang Xray "

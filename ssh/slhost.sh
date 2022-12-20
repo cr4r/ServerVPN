@@ -10,7 +10,6 @@ rm -rf /etc/xray/domain &>/dev/null
 rm -rf /root/nsdomain &>/dev/null
 rm -rf /var/lib/crot/ipvps.conf &>/dev/null
 rm -rf /root/nsdomain &>/dev/null
-rm -rf /root/domain &>/dev/null
 
 mkdir -p /usr/bin/xray
 mkdir -p /usr/bin/v2ray
@@ -111,7 +110,7 @@ clear
 msg -gr "Domain VPS Anda : $SUB_DOMAIN"
 msg -gr "Domain untuk SlowDNS : $NS_DOMAIN"
 echo "IP=""$SUB_DOMAIN" >/var/lib/crot/ipvps.conf
-echo $SUB_DOMAIN >$home
+echo $SUB_DOMAIN >$home/domain
 echo "$SUB_DOMAIN" >/etc/v2ray/domain
 echo "$SUB_DOMAIN" >/etc/xray/domain
 echo "$NS_DOMAIN" >/etc/slowdns/nsdomain
