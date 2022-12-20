@@ -56,6 +56,8 @@
 	export ptrojango="raw.githubusercontent.com/cr4r/ServerVPN/main/trojango"
 	# Link Hosting Kalian Untuk stunnel5
 	export pstunnel5="raw.githubusercontent.com/cr4r/ServerVPN/main/stunnel5"
+	export psldns="https://raw.githubusercontent.com/cr4r/ServerVPN/main/SLDNS"
+
 	# Getting
 	clear
 
@@ -70,7 +72,7 @@
 	## fi
 
 	mkdir -p /var/lib/crot
-	# echo "IP=" >>/var/lib/crot/ipvps.conf
+	echo "IP=" >>/var/lib/crot/ipvps.conf
 	# msg -line " Seting Domain VPS "
 	# . <(curl -s ${pssh}/slhost.sh) ### Sudah Fix
 	# # . ${HomeRepo}/ssh/slhost.sh
@@ -79,10 +81,10 @@
 	# . <(curl -s ${pxray}/ins-xray.sh) ### Sudah Fix
 	# # . ${HomeRepo}/xray/ins-xray.sh
 
-	# #install ssh ovpn
-	msg -line " Install ssh ovpn "
-	# . <(curl -s ${pssh}/ssh-vpn.sh) ### Belum Fix
-	. ${HomeRepo}/ssh/ssh-vpn.sh
+	# #install ssh ovpn ###############################################>
+	# msg -line " Install ssh ovpn "
+	# # . <(curl -s ${pssh}/ssh-vpn.sh) ### Belum Fix
+	# . ${HomeRepo}/ssh/ssh-vpn.sh
 
 	# wget ${psstp}/sstp.sh && chmod +x sstp.sh && screen -S sstp ./sstp.sh
 	# #install ssr
@@ -97,8 +99,10 @@
 	# wget ${pwst}/edu.sh && chmod +x edu.sh && ./edu.sh
 	# # Ohp Server
 	# wget ${pohp}/ohp.sh && chmod +x ohp.sh && ./ohp.sh
-	# # Install SlowDNS
-	# wget https://raw.githubusercontent.com/cr4r/ServerVPN/main/SLDNS/install-sldns && chmod +x install-sldns && ./install-sldns
+	# Install SlowDNS
+	# . <(curl -s ${psldns}/install-sldns.sh) ### Belum Fix
+	. ${HomeRepo}/SLDNS/install-sldns.sh
+
 	# # Informasi IP Saya dan Semua Port TCP UDP
 	# # wget https://raw.githubusercontent.com/cr4r/ServerVPN/main/ipsaya.sh && chmod +x ipsaya.sh
 	# #

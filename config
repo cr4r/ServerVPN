@@ -120,3 +120,6 @@ export HomeRepo="/root/ServerVPN"
 export home="/root/LogServerVPN"
 export urlFile="https://raw.githubusercontent.com/cr4r/ServerVPN"
 export NET=$(ip -o $ANU -4 route show to default | awk '{print $5}')
+export dir_slh="/etc/slowdns"
+export dir_v2ray="/etc/v2ray"
+export dir_xray="/etc/xray"

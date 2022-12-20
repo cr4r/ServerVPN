@@ -16,6 +16,7 @@ mkdir -p /usr/bin/xray
 mkdir -p /usr/bin/v2ray
 mkdir -p /etc/xray
 mkdir -p /etc/v2ray
+mkdir -p /etc/slowdns
 
 while [[ $konfirmDomain != @(s|S|y|Y|n|N|t|T) ]]; do
   msg -ne "Ada domain sendiri (Y/T) ? " && read konfirmDomain
@@ -110,8 +111,8 @@ clear
 msg -gr "Domain VPS Anda : $SUB_DOMAIN"
 msg -gr "Domain untuk SlowDNS : $NS_DOMAIN"
 echo "IP=""$SUB_DOMAIN" >/var/lib/crot/ipvps.conf
-echo $SUB_DOMAIN >/root/domain
+echo $SUB_DOMAIN >$home
 echo "$SUB_DOMAIN" >/etc/v2ray/domain
-echo "$NS_DOMAIN" >/root/nsdomain
+echo "$NS_DOMAIN" >/etc/slowdns/nsdomain
 echo "$SUB_DOMAIN" >/etc/xray/domain
 pause
