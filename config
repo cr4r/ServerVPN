@@ -155,6 +155,10 @@ hapus_tool() {
   rm -rf /etc/nginx/sites-enabled/port80.conf /home/vps/ &>/dev/null
 }
 
+tanya() {
+  read -p "$(msg -ne '$1 => ')" $2
+}
+
 ### Export Function
 export -f msg
 export -f inst_comp
@@ -165,6 +169,8 @@ export -f hapus_tool
 export -f hapus_ssh
 export -f hapus_xray
 export -f hapus_trojango
+export -f tanya
+
 ### Export Variabel
 export HomeRepo="/root/ServerVPN"
 export rawRepo="https://raw.githubusercontent.com/cr4r/ServerVPN/main"

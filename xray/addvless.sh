@@ -30,18 +30,17 @@ else
 	domain=$IP
 fi
 
-tls="$(cat ${home}/log-install.txt | grep -w "Vless TLS" | cut -d: -f2 | sed 's/ //g')"
-nontls="$(cat ${home}/log-install.txt | grep -w "Vless None TLS" | cut -d: -f2 | sed 's/ //g')"
+source /etc/xray/port
 until [[ $user =~ ^[a-zA-Z0-9_]+$ && ${CLIENT_EXISTS} == '0' ]]; do
-	read -rp "Username : " -e user
+	read -p $(msg -ne "Username : ") user
 	CLIENT_EXISTS=$(grep -w $user /etc/xray/config.json | wc -l)
 
 	if [[ ${CLIENT_EXISTS} == '1' ]]; then
-		echo ""
-		echo -e "Username ${RED}${user}${NC} Already On VPS Please Choose Another"
+		msg -warn "Username $(msg -gr user) Already On VPS Please Choose Another"
 		exit 1
 	fi
 done
+
 uuid=$(cat /proc/sys/kernel/random/uuid)
 read -p "Expired (Days) : " masaaktif
 hariini=$(date -d "0 days" +"%Y-%m-%d")

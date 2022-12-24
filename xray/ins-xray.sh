@@ -64,17 +64,17 @@ fi
 cd $home
 msg -gr "Cert digunakan untuk mendukung https dan ini wajib!!"
 while [[ $konCert != @(s|S|y|Y|n|N|t|T) ]]; do
-  msg -ne "Apakah sudah ada cert untuk domain ? (Y/T)" && read konCert
+  tanya "Apakah sudah ada cert untuk domain (Y/T)" konCert
   tput cuu1 && tput dl1
 done
 echo $konCert
 if [[ $konCert == @(s|S|y|Y) ]]; then
   while [[ $path_crt == "" ]]; do
-    msg -ne "Lokasi FullChain: " && read path_crt
+    tanya "Lokasi FullChain" path_crt
     tput cuu1 && tput dl1
   done
   while [[ $path_key == "" ]]; do
-    msg -ne "Lokasi FullChain: " && read path_key
+    tanya "Lokasi KeyChain" path_key
     tput cuu1 && tput dl1
   done
 else
