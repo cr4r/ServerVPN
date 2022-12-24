@@ -579,5 +579,5 @@ msg -org "Servername : $(cat ${dir_xray}/domain)"
 msg -org "Port : 89"
 
 echo "tls=portTLS" >/etc/xray/port
-echo "nontls=portNonTLS" >/etc/xray/port
-echo "fallback=portFallBack" >/etc/xray/port
+echo "nontls=portNonTLS" >>/etc/xray/port
+echo "fallback=portFallBack" >>/etc/xray/port
