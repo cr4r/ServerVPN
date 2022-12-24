@@ -167,7 +167,7 @@ export -f hapus_xray
 export -f hapus_trojango
 ### Export Variabel
 export HomeRepo="/root/ServerVPN"
-export rawRepo="https://raw.githubusercontent.com/cr4r/ServerVPN/main/"
+export rawRepo="https://raw.githubusercontent.com/cr4r/ServerVPN/main"
 export dir_slh="/etc/slowdns"
 export dir_v2ray="/etc/v2ray"
 export dir_xray="/etc/xray"
