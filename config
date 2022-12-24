@@ -119,12 +119,12 @@ hapus_xray() {
   rm -rf /usr/bin/xray /etc/xray /var/log/xray/ /usr/local/bin/xray &>/dev/null
 
   msg -warn "Menghapus Folder SlowDNS"
-  rm -rf /root/domain /etc/v2ray/domain /etc/xray/domain /root/nsdomain /var/lib/crot/ipvps.conf /root/nsdomain /root/domain /etc/slowdns &>/dev/null
+  rm -rf /root/domain /etc/v2ray /etc/xray /root/nsdomain /var/lib/crot/ipvps.conf /root/nsdomain /root/domain /etc/slowdns &>/dev/null
   rm -rf $(whereis slowdns) &>/dev/null
 
   msg -warn "Menghapus Folder V2RAY"
   rm -rf $(whereis v2ray) &>/dev/null
-  rm -rf /usr/bin/xray /usr/bin/v2ray /etc/xray /etc/v2ray /etc/v2ray/domain /root/nsdomain /etc/xray/domain /var/lib/crot/ipvps.conf &>/dev/null
+  rm -rf /usr/bin/xray /usr/bin/v2ray /etc/xray /etc/v2ray /root/nsdomain /etc/xray /var/lib/crot/ipvps.conf &>/dev/null
 
   rm /etc/systemd/system/xray.service /etc/systemd/system/trojan-go.service &>/dev/null
   systemctl disable xray.service &>/dev/null
