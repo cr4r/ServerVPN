@@ -577,3 +577,7 @@ msg -line
 msg -warn "VMESS"
 msg -org "Servername : $(cat ${dir_xray}/domain)"
 msg -org "Port : 89"
+
+tls=portTLS >/etc/xray/port
+nontls=portNonTLS >/etc/xray/port
+fallback=portFallBack >/etc/xray/port

@@ -1,6 +1,7 @@
 #!/bin/bash
 # SL
 # ==========================================
+. <(curl -s https://raw.githubusercontent.com/cr4r/ServerVPN/main/config)
 # Color
 RED='\033[0;31m'
 NC='\033[0m'
@@ -12,39 +13,39 @@ CYAN='\033[0;36m'
 LIGHT='\033[0;37m'
 # ==========================================
 # Getting
-MYIP=$(wget -qO- ipinfo.io/ip);
-echo "Checking VPS"
-IZIN=$( curl ipinfo.io/ip | grep $MYIP )
-if [ $MYIP = $MYIP ]; then
-echo -e "${NC}${GREEN}Permission Accepted...${NC}"
+IZIN=$(curl ipinfo.io/ip | grep $IP)
+
+if [ $IP = $IP ]; then
+	msg -gr "Permission Accepted..."
 else
-echo -e "${NC}${RED}Permission Denied!${NC}";
-echo -e "${NC}${LIGHT}Fuck You!!"
-exit 0
+	msg -warn "Permission Denied!"
+	exit 0
 fi
 clear
+
 source /var/lib/crot/ipvps.conf
 if [[ "$IP" = "" ]]; then
-domain=$(cat /etc/xray/domain)
+	domain=$(cat /etc/xray/domain)
 else
-domain=$IP
+	domain=$IP
 fi
-tls="$(cat ~/log-install.txt | grep -w "Vless TLS" | cut -d: -f2|sed 's/ //g')"
-nontls="$(cat ~/log-install.txt | grep -w "Vless None TLS" | cut -d: -f2|sed 's/ //g')"
-until [[ $user =~ ^[a-zA-Z0-9_]+$ && ${CLIENT_EXISTS} == '0' ]]; do
-		read -rp "Username : " -e user
-		CLIENT_EXISTS=$(grep -w $user /etc/xray/config.json | wc -l)
 
-		if [[ ${CLIENT_EXISTS} == '1' ]]; then
-			echo ""
-			echo -e "Username ${RED}${user}${NC} Already On VPS Please Choose Another"
-			exit 1
-		fi
-	done
+tls="$(cat ${home}/log-install.txt | grep -w "Vless TLS" | cut -d: -f2 | sed 's/ //g')"
+nontls="$(cat ${home}/log-install.txt | grep -w "Vless None TLS" | cut -d: -f2 | sed 's/ //g')"
+until [[ $user =~ ^[a-zA-Z0-9_]+$ && ${CLIENT_EXISTS} == '0' ]]; do
+	read -rp "Username : " -e user
+	CLIENT_EXISTS=$(grep -w $user /etc/xray/config.json | wc -l)
+
+	if [[ ${CLIENT_EXISTS} == '1' ]]; then
+		echo ""
+		echo -e "Username ${RED}${user}${NC} Already On VPS Please Choose Another"
+		exit 1
+	fi
+done
 uuid=$(cat /proc/sys/kernel/random/uuid)
 read -p "Expired (Days) : " masaaktif
-hariini=`date -d "0 days" +"%Y-%m-%d"`
-exp=`date -d "$masaaktif days" +"%Y-%m-%d"`
+hariini=$(date -d "0 days" +"%Y-%m-%d")
+exp=$(date -d "$masaaktif days" +"%Y-%m-%d")
 sed -i '/#xray-vless-tls$/a\#### '"$user $exp"'\
 },{"id": "'""$uuid""'","email": "'""$user""'"' /etc/xray/config.json
 sed -i '/#xray-vless-nontls$/a\#### '"$user $exp"'\
@@ -57,7 +58,7 @@ clear
 echo -e ""
 echo -e "======-XRAYS/VLESS-======"
 echo -e "Remarks     : ${user}"
-echo -e "IP/Host     : ${MYIP}"
+echo -e "IP/Host     : ${IP}"
 echo -e "Address     : ${domain}"
 echo -e "Port TLS    : $tls"
 echo -e "Port No TLS : $nontls"

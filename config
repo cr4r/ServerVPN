@@ -146,6 +146,7 @@ hapus_trojango() {
 }
 
 hapus_tool() {
+  rm -rf /root/LogServerVPN &>/dev/null
   hapus_ssh
   hapus_xray
   hapus_trojango
@@ -153,6 +154,7 @@ hapus_tool() {
   ### Nginx port
   rm -rf /etc/nginx/sites-enabled/port80.conf /home/vps/ &>/dev/null
 }
+
 ### Export Function
 export -f msg
 export -f inst_comp
