@@ -32,34 +32,36 @@
 	CYAN='\033[0;36m'
 	LIGHT='\033[0;37m'
 	# ==========================================
+	# Link Hosting
+	export pge="https://raw.githubusercontent.com/cr4r/ServerVPN/main"
 	# Link Hosting Kalian Untuk Ssh Vpn
-	export pssh="https://raw.githubusercontent.com/cr4r/ServerVPN/main/ssh"
+	export pssh="${pge}/ssh"
 	# Link Hosting Kalian Untuk Sstp
-	export psstp="https://raw.githubusercontent.com/cr4r/ServerVPN/main/sstp"
+	export psstp="${pge}/sstp"
 	# Link Hosting Kalian Untuk Ssr
-	export pssr="https://raw.githubusercontent.com/cr4r/ServerVPN/main/ssr"
+	export pssr="${pge}/ssr"
 	# Link Hosting Kalian Untuk Shadowsocks
-	export psocks="https://raw.githubusercontent.com/cr4r/ServerVPN/main/shadowsocks"
+	export psocks="${pge}/shadowsocks"
 	# Link Hosting Kalian Untuk Wireguard
-	export pwrguard="https://raw.githubusercontent.com/cr4r/ServerVPN/main/wireguard"
+	export pwrguard="${pge}/wireguard"
 	# Link Hosting Kalian Untuk Xray
-	export pxray="https://raw.githubusercontent.com/cr4r/ServerVPN/main/xray"
+	export pxray="${pge}/xray"
 	# Link Hosting Kalian Untuk Ipsec
-	export pipsec="https://raw.githubusercontent.com/cr4r/ServerVPN/main/ipsec"
+	export pipsec="${pge}/ipsec"
 	# Link Hosting Kalian Untuk Backup
-	export pbackup="https://raw.githubusercontent.com/cr4r/ServerVPN/main/backup"
+	export pbackup="${pge}/backup"
 	# Link Hosting Kalian Untuk Websocket
-	export pwst="https://raw.githubusercontent.com/cr4r/ServerVPN/main/websocket"
+	export pwst="${pge}/websocket"
 	# Link Hosting Kalian Untuk Ohp
-	export pohp="https://raw.githubusercontent.com/cr4r/ServerVPN/main/ohp"
+	export pohp="${pge}/ohp"
 	# Link Hosting Kalian Untuk trojan-go
-	export ptrojango="raw.githubusercontent.com/cr4r/ServerVPN/main/trojango"
+	export ptrojango="${pge}/trojango"
 	# Link Hosting Kalian Untuk stunnel5
-	export pstunnel5="raw.githubusercontent.com/cr4r/ServerVPN/main/stunnel5"
+	export pstunnel5="${pge}/stunnel5"
 	# Link Hosting Kalian Untuk sldns
-	export psldns="https://raw.githubusercontent.com/cr4r/ServerVPN/main/SLDNS"
+	export psldns="${pge}/SLDNS"
 	# Link Hosting Kalian Untuk sldns
-	export psslh="https://raw.githubusercontent.com/cr4r/ServerVPN/main/sslh-fix"
+	export psslh="${pge}/sslh-fix"
 	# Getting
 	clear
 
@@ -73,14 +75,14 @@
 	## 	exit 0
 	## fi
 
-	# mkdir -p /var/lib/crot
-	# echo "IP=" >>/var/lib/crot/ipvps.conf
-	# msg -line " Seting Domain VPS "
-	# . <(curl -s ${pssh}/slhost.sh) ### Sudah Fix
+	mkdir -p /var/lib/crot
+	echo "IP=" >>/var/lib/crot/ipvps.conf
+	msg -line " Seting Domain VPS "
+	. <(curl -s ${pssh}/slhost.sh) ### Sudah Fix
 	# # . ${HomeRepo}/ssh/slhost.sh
 
-	# msg -line " Install XRAY "
-	# . <(curl -s ${pxray}/ins-xray.sh) ### Sudah Fix
+	msg -line " Install XRAY "
+	. <(curl -s ${pxray}/ins-xray.sh) ### Sudah Fix
 	# . ${HomeRepo}/xray/ins-xray.sh
 
 	# #install ssh ovpn ###############################################>
@@ -103,11 +105,11 @@
 	# wget ${pohp}/ohp.sh && chmod +x ohp.sh && ./ohp.sh
 	# Install SlowDNS
 	# . <(curl -s ${psldns}/install-sldns.sh) ### Belum Fix
-	. ${HomeRepo}/SLDNS/install-sldns
+	# . ${HomeRepo}/SLDNS/install-sldns
 
 	# # Informasi IP Saya dan Semua Port TCP UDP
-	# # wget https://raw.githubusercontent.com/cr4r/ServerVPN/main/ipsaya.sh && chmod +x ipsaya.sh
-	# #
+	. <(curl -s ${pge}/ipsaya.sh) ### Sudah Fix
+
 	# # install xray sl-grpc
 	# # wget https://raw.githubusercontent.com/cr4r/ServerVPN/main/grpc/sl-grpc.sh && chmod +x sl-grpc.sh && screen -S sl-grpc ./sl-grpc.sh
 	# # install xray grpc
@@ -115,27 +117,28 @@
 	# # install shadowsocks plugin
 	# # wget https://raw.githubusercontent.com/cr4r/ServerVPN/main/shadowsocks-plugin/install-ss-plugin.sh && chmod +x install-ss-plugin.sh && ./install-ss-plugin.sh
 
-	# history -c
-	# echo "1.2" >/home/ver
-	# echo " "
-	# echo "Installation has been completed!!"echo " "
-	# echo "============================================================================" | tee -a log-install.txt
-	# echo "" | tee -a log-install.txt
-	# echo "----------------------------------------------------------------------------" | tee -a log-install.txt
-	# echo "" | tee -a log-install.txt
-	# echo "   >>> Service & Port" | tee -a log-install.txt
-	# echo "   - SlowDNS SSH             : ALL Port SSH" | tee -a log-install.txt
-	# echo "   - OpenSSH                 : 22, 2253" | tee -a log-install.txt
+	history -c
+	echo "1.2" >/$home/ver
+	cd $home
+	echo " "
+	echo "Installation has been completed!!"
+	echo "============================================================================" | tee -a log-install.txt
+	echo "" | tee -a log-install.txt
+	echo "----------------------------------------------------------------------------" | tee -a log-install.txt
+	echo "" | tee -a log-install.txt
+	echo "   >>> Service & Port" | tee -a log-install.txt
+	echo "   - SlowDNS SSH             : ALL Port SSH" | tee -a log-install.txt
+	echo "   - OpenSSH                 : 22, 2253" | tee -a log-install.txt
 	# echo "   - OpenVPN                 : TCP 1194, UDP 2200, SSL 990" | tee -a log-install.txt
 	# echo "   - Stunnel5                : 443, 445" | tee -a log-install.txt
 	# echo "   - Dropbear                : 443, 109, 143" | tee -a log-install.txt
-	# echo "   - CloudFront Websocket    : " | tee -a log-install.txt
+	echo "   - CloudFront Websocket    : " | tee -a log-install.txt
 	# echo "   - SSH Websocket TLS       : 443" | tee -a log-install.txt
 	# echo "   - SSH Websocket HTTP      : 8880" | tee -a log-install.txt
 	# echo "   - Websocket OpenVPN       : 2086" | tee -a log-install.txt
 	# echo "   - Squid Proxy             : 3128, 8080" | tee -a log-install.txt
-	# echo "   - Badvpn                  : 7100, 7200, 7300" | tee -a log-install.txt
-	# echo "   - Nginx                   : 89" | tee -a log-install.txt
+	echo "   - Badvpn                  : 7100, 7200, 7300" | tee -a log-install.txt
+	echo "   - Nginx                   : 89" | tee -a log-install.txt
 	# echo "   - Wireguard               : 7070" | tee -a log-install.txt
 	# echo "   - L2TP/IPSEC VPN          : 1701" | tee -a log-install.txt
 	# echo "   - PPTP VPN                : 1732" | tee -a log-install.txt
@@ -143,33 +146,33 @@
 	# echo "   - Shadowsocks-R           : 1443-1543" | tee -a log-install.txt
 	# echo "   - SS-OBFS TLS             : 2443-2543" | tee -a log-install.txt
 	# echo "   - SS-OBFS HTTP            : 3443-3543" | tee -a log-install.txt
-	# echo "   - XRAYS Vmess TLS         : 8443" | tee -a log-install.txt
-	# echo "   - XRAYS Vmess None TLS    : 80" | tee -a log-install.txt
-	# echo "   - XRAYS Vless TLS         : 8443" | tee -a log-install.txt
-	# echo "   - XRAYS Vless None TLS    : 80" | tee -a log-install.txt
-	# echo "   - XRAYS Trojan            : 2083" | tee -a log-install.txt
+	echo "   - XRAYS Vmess TLS         : 8443" | tee -a log-install.txt
+	echo "   - XRAYS Vmess None TLS    : 80" | tee -a log-install.txt
+	echo "   - XRAYS Vless TLS         : 8443" | tee -a log-install.txt
+	echo "   - XRAYS Vless None TLS    : 80" | tee -a log-install.txt
+	echo "   - XRAYS Trojan            : 2083" | tee -a log-install.txt
 	# echo "   - XRAYS VMESS GRPC        : 1180" | tee -a log-install.txt
 	# echo "   - XRAYS VLESS GRPC        : 2280" | tee -a log-install.txt
 	# echo "   - OHP SSH                 : 8181" | tee -a log-install.txt
 	# echo "   - OHP Dropbear            : 8282" | tee -a log-install.txt
 	# echo "   - OHP OpenVPN             : 8383" | tee -a log-install.txt
 	# echo "   - TrojanGo                : 2087" | tee -a log-install.txt
-	# echo "" | tee -a log-install.txt
-	# echo "   >>> Server Information & Other Features" | tee -a log-install.txt
-	# echo "   - Timezone                : Asia/Jakarta (GMT +7)" | tee -a log-install.txt
-	# echo "   - Fail2Ban                : [ON]" | tee -a log-install.txt
-	# echo "   - Dflate                  : [ON]" | tee -a log-install.txt
-	# echo "   - IPtables                : [ON]" | tee -a log-install.txt
-	# echo "   - Auto-Reboot             : [ON]" | tee -a log-install.txt
-	# echo "   - IPv6                    : [OFF]" | tee -a log-install.txt
-	# echo "   - Autoreboot On 05.00 GMT +7" | tee -a log-install.txt
-	# echo "   - Autobackup Data" | tee -a log-install.txt
-	# echo "   - Restore Data" | tee -a log-install.txt
-	# echo "   - Auto Delete Expired Account" | tee -a log-install.txt
-	# echo "   - Full Orders For Various Services" | tee -a log-install.txt
-	# echo "   - White Label" | tee -a log-install.txt
-	# echo "   - Installation Log --> /root/log-install.txt" | tee -a log-install.txt
-	# echo " Reboot 15 Sec"
-	# sleep 15
+	echo "" | tee -a log-install.txt
+	echo "   >>> Server Information & Other Features" | tee -a log-install.txt
+	echo "   - Timezone                : Asia/Jakarta (GMT +7)" | tee -a log-install.txt
+	echo "   - Fail2Ban                : [ON]" | tee -a log-install.txt
+	echo "   - Dflate                  : [ON]" | tee -a log-install.txt
+	echo "   - IPtables                : [ON]" | tee -a log-install.txt
+	echo "   - Auto-Reboot             : [ON]" | tee -a log-install.txt
+	echo "   - IPv6                    : [OFF]" | tee -a log-install.txt
+	echo "   - Autoreboot On 05.00 GMT +7" | tee -a log-install.txt
+	echo "   - Autobackup Data" | tee -a log-install.txt
+	echo "   - Restore Data" | tee -a log-install.txt
+	echo "   - Auto Delete Expired Account" | tee -a log-install.txt
+	echo "   - Full Orders For Various Services" | tee -a log-install.txt
+	echo "   - White Label" | tee -a log-install.txt
+	echo "   - Installation Log --> /root/log-install.txt" | tee -a log-install.txt
+	echo " Reboot 5 Sec"
+	sleep 5
 	# reboot
 ) 2>&1 | tee -a /tmp/setupVPN.log

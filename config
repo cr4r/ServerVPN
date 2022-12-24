@@ -100,19 +100,32 @@ install_all_component() {
   fi
 }
 
-hapus_tool() {
+hapus_ssh() {
+  rm -rf $(whereis dropbear) &>/dev/null
+  rm -rf $(whereis badvpn-udpgw) &>/dev/null
+
   apt --purge remove dropbear* -y &>/dev/null
+  rm -rf /etc/default/dropbear &>/dev/null
 
+  ### Badvpn
+  rm -rf /usr/bin/badvpn-udpgw &>/dev/null
+
+}
+
+hapus_xray() {
+  msg -line " XRAY "
+  msg -warn "Hapus Folder"
   rm -rf $(whereis xray) &>/dev/null
-  rm -rf $(whereis slowdns) &>/dev/null
-  rm -rf $(whereis v2ray) &>/dev/null
+  rm -rf /usr/bin/xray /etc/xray /var/log/xray/ /usr/local/bin/xray &>/dev/null
 
-  ### SLHost
+  msg -warn "Menghapus Folder SlowDNS"
   rm -rf /root/domain /etc/v2ray/domain /etc/xray/domain /root/nsdomain /var/lib/crot/ipvps.conf /root/nsdomain /root/domain /etc/slowdns &>/dev/null
+  rm -rf $(whereis slowdns) &>/dev/null
+
+  msg -warn "Menghapus Folder V2RAY"
+  rm -rf $(whereis v2ray) &>/dev/null
   rm -rf /usr/bin/xray /usr/bin/v2ray /etc/xray /etc/v2ray /etc/v2ray/domain /root/nsdomain /etc/xray/domain /var/lib/crot/ipvps.conf &>/dev/null
 
-  ### XRAY
-  rm -rf /usr/bin/xray /etc/xray /var/log/xray/ /usr/local/bin/xray &>/dev/null
   rm /etc/systemd/system/xray.service /etc/systemd/system/trojan-go.service &>/dev/null
   systemctl disable xray.service &>/dev/null
   systemctl stop xray.service &>/dev/null
@@ -123,23 +136,23 @@ hapus_tool() {
   systemctl stop /etc/systemd/system/server-sldns.service &>/dev/null
   systemctl disable /etc/systemd/system/server-sldns.service &>/dev/null
   rm -rf /etc/systemd/system/client-sldns.service /etc/slowdns &>/dev/null
+}
 
+hapus_trojango() {
   ### Trojan-GO
   rm -rf /usr/bin/trojan-go /etc/trojan-go /usr/local/bin/trojan-go /var/log/trojan-go/ &>/dev/null
   systemctl disable trojan-go.service &>/dev/null
   systemctl stop trojan-go.service &>/dev/null
+}
+
+hapus_tool() {
+  hapus_ssh
+  hapus_xray
+  hapus_trojango
 
   ### Nginx port
   rm -rf /etc/nginx/sites-enabled/port80.conf /home/vps/ &>/dev/null
-
-  ### Badvpn
-  rm -rf /usr/bin/badvpn-udpgw &>/dev/null
-
-  ### Dropbear
-  rm -rf /etc/default/dropbear &>/dev/null
-
 }
-
 ### Export Function
 export -f msg
 export -f inst_comp
@@ -147,6 +160,9 @@ export -f persen
 export -f pause
 export -f install_all_component
 export -f hapus_tool
+export -f hapus_ssh
+export -f hapus_xray
+export -f hapus_trojango
 ### Export Variabel
 export HomeRepo="/root/ServerVPN"
 export rawRepo="https://raw.githubusercontent.com/cr4r/ServerVPN/main/"
@@ -158,3 +174,5 @@ export home="/root/LogServerVPN"
 export IP=$(curl -Ls http://ipinfo.io/ip)
 export urlFile="https://raw.githubusercontent.com/cr4r/ServerVPN"
 export NET=$(ip -o $ANU -4 route show to default | awk '{print $5}')
+
+$1

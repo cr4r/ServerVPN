@@ -566,7 +566,7 @@ systemctl start trojan-go &>/dev/null
 systemctl enable trojan-go &>/dev/null
 systemctl restart trojan-go &>/dev/null
 
-msg -line " Instalasi Xray dan Trojan Go Selesai! "
+msg -warn "Instalasi Xray dan Trojan Go Selesai!"
 msg -line " Informasi tentang Xray "
 msg -warn "VMESS"
 msg -org "Servername : $(cat ${dir_xray}/domain)"
