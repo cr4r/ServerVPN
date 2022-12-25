@@ -79,74 +79,61 @@ install_all_component() {
   fi
 }
 
-install_all_component() {
-  plugin=$1
-  totalPLugin=$(wc -l <<<$plugin)
-  if [[ $totalPLugin == 0 ]]; then
-    msg -red "Tidak ada plugin yang di install"
-  else
-    msg -warn "${totalPLugin} plugin yang akan di install"
-    numm=1
-    for abc in $plugin; do
-      if [[ $abc != "" ]]; then
-        prsn=$(persen $numm/$totalPLugin)
-        msg -red "Proses Instalasi ${prsn}"
-        inst_comp $abc
-        let numm++
-        tput cuu1 && tput cuu1
-      fi
-    done
-    msg -gr "${totalPLugin} plugin yang akan di install [Selesai]"
-  fi
+hapus_target() {
+  msg -warn "Menghapus $1"
+  systemctl stop $1 &>/dev/null
+  systemctl disable $1 &>/dev/null
+
+  apt --purge remove *$1* -y &>/dev/null
+  apt autoremove -y &>/dev/null
+
+  rm -rf $(whereis $1) &>/dev/null
+  find /etc/ -name "*${1}*" -delete &>/dev/null
+  find /usr/bin/ -name "*${1}*" -delete &>/dev/null
+  find /usr/local/bin/ -name "*${1}*" -delete &>/dev/null
+  find /etc/init.d -name "*${1}*" -delete &>/dev/null
+  find /etc/systemd/system -name "*${1}*" -delete &>/dev/null
+  find /var/log/ -name "*${1}*" -delete &>/dev/null
 }
 
 hapus_ssh() {
-  rm -rf $(whereis dropbear) &>/dev/null
-  rm -rf $(whereis badvpn-udpgw) &>/dev/null
-
-  apt --purge remove dropbear* -y &>/dev/null
-  rm -rf /etc/default/dropbear &>/dev/null
-
-  ### Badvpn
-  rm -rf /usr/bin/badvpn-udpgw &>/dev/null
-
+  hapus_target dropbear
+  hapus_target badvpn-udpgw
+  hapus_target sslh
 }
 
 hapus_xray() {
-  msg -line " XRAY "
-  msg -warn "Hapus Folder"
-  rm -rf $(whereis xray) &>/dev/null
-  rm -rf /usr/bin/xray /etc/xray /var/log/xray/ /usr/local/bin/xray &>/dev/null
+  hapus_target xray
+  hapus_target xlts-xray
+  hapus_target vless
+  hapus_target vmess
+  hapus_target grpc
+  hapus_target nsdomain
+  hapus_target domain
 
-  msg -warn "Menghapus Folder SlowDNS"
-  rm -rf /root/domain /etc/v2ray /etc/xray /root/nsdomain /var/lib/crot/ipvps.conf /root/nsdomain /root/domain /etc/slowdns &>/dev/null
-  rm -rf $(whereis slowdns) &>/dev/null
+  hapus_target v2ray
+  hapus_target client-sldns
+  hapus_target server-sldns
 
-  msg -warn "Menghapus Folder V2RAY"
-  rm -rf $(whereis v2ray) &>/dev/null
-  rm -rf /usr/bin/xray /usr/bin/v2ray /etc/xray /etc/v2ray /root/nsdomain /etc/xray /var/lib/crot/ipvps.conf &>/dev/null
-
-  rm /etc/systemd/system/xray.service /etc/systemd/system/trojan-go.service &>/dev/null
-  systemctl disable xray.service &>/dev/null
-  systemctl stop xray.service &>/dev/null
-
-  ### Slowdns
-  systemctl stop client-sldns.service &>/dev/null
-  systemctl disable client-sldns.service &>/dev/null
-  systemctl stop /etc/systemd/system/server-sldns.service &>/dev/null
-  systemctl disable /etc/systemd/system/server-sldns.service &>/dev/null
-  rm -rf /etc/systemd/system/client-sldns.service /etc/slowdns &>/dev/null
+  hapus_target slowdns
+  rm -rf /var/lib/crot/ipvps.conf &>/dev/null
 }
 
 hapus_trojango() {
-  ### Trojan-GO
-  rm -rf /usr/bin/trojan-go /etc/trojan-go /usr/local/bin/trojan-go /var/log/trojan-go/ &>/dev/null
-  systemctl disable trojan-go.service &>/dev/null
-  systemctl stop trojan-go.service &>/dev/null
+  hapus_target trojan-go
+  hapus_target trojango
 }
 
 hapus_tool() {
   rm -rf /root/LogServerVPN &>/dev/null
+  hapus_target sstp
+  hapus_target l2tp
+  hapus_target pptp
+  hapus_target addss
+  hapus_target sstp
+  hapus_target ssr
+  hapus_target addwg
+  hapus_target vnstat
   hapus_ssh
   hapus_xray
   hapus_trojango
@@ -183,4 +170,21 @@ export IP=$(curl -Ls http://ipinfo.io/ip)
 export urlFile="https://raw.githubusercontent.com/cr4r/ServerVPN"
 export NET=$(ip -o $ANU -4 route show to default | awk '{print $5}')
 
+### link tools
+export pssh="${rawRepo}/ssh"
+export psstp="${rawRepo}/sstp"
+export pssr="${rawRepo}/ssr"
+export psocks="${rawRepo}/shadowsocks"
+export pwrguard="${rawRepo}/wireguard"
+export pxray="${rawRepo}/xray"
+export pipsec="${rawRepo}/ipsec"
+export pbackup="${rawRepo}/backup"
+export pwst="${rawRepo}/websocket"
+export pohp="${rawRepo}/ohp"
+export ptrojango="${rawRepo}/trojango"
+export pstunnel5="${rawRepo}/stunnel5"
+export psldns="${rawRepo}/SLDNS"
+export psslh="${rawRepo}/sslh-fix"
+
+### Jika ingin run function secara langsung
 $1

@@ -10,26 +10,13 @@ PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 LIGHT='\033[0;37m'
 # ==========================================
-# Getting
-MYIP=$(wget -qO- ipinfo.io/ip);
-# ==================================================
-# Link Hosting Kalian
-akbarvpn=""raw.githubusercontent.com/fisabiliyusri/Mantap/main/ssh
-
-# Link Hosting Kalian Untuk Xray
-akbarvpnn="raw.githubusercontent.com/fisabiliyusri/Mantap/main/xray"
-
-# Link Hosting Kalian Untuk Trojan Go
-akbarvpnnn="raw.githubusercontent.com/fisabiliyusri/Mantap/main/trojango"
-
-# Link Hosting Kalian Untuk Stunnel5
-akbarvpnnnn="raw.githubusercontent.com/fisabiliyusri/Mantap/main/stunnel5"
+# Getting config
+. <(curl -s https://raw.githubusercontent.com/cr4r/ServerVPN/main/config)
 
 # initializing var
 export DEBIAN_FRONTEND=noninteractive
-MYIP=$(wget -qO- ipinfo.io/ip);
-MYIP2="s/xxxxxxxxx/$MYIP/g";
-NET=$(ip -o $ANU -4 route show to default | awk '{print $5}');
+MYIP2="s/xxxxxxxxx/$IP/g"
+NET=$(ip -o $ANU -4 route show to default | awk '{print $5}')
 source /etc/os-release
 ver=$VERSION_ID
 
@@ -37,12 +24,12 @@ ver=$VERSION_ID
 country=ID
 state=Indonesia
 locality=Indonesia
-organization=akbarstorevpn
-organizationalunit=akbarstorevpn
-commonname=akbarstorevpn
-email=akbarssh21@gmail.com
+organization=codersfamily
+organizationalunit=codersfamily
+commonname=codersfamily
+email=cr4rrr@gmail.com
 
-cd
+cd $home
 
 # ssl
 # Install SSLH
@@ -50,7 +37,7 @@ apt -y install sslh
 rm -f /etc/default/sslh
 
 # Settings SSLH
-cat > /etc/default/sslh <<-END
+cat >/etc/default/sslh <<-END
 # Default options for sslh initscript
 # sourced by /etc/init.d/sslh
 
@@ -79,11 +66,11 @@ systemctl restart sslh
 /etc/init.d/sslh status
 /etc/init.d/sslh restart
 
-
 # ssl
-# install stunnel 5 
-cd /root/
-wget -q -O stunnel5.zip "https://${akbarvpnnnn}/stunnel5.zip"
+# install stunnel 5
+cd $home
+wget -q -O stunnel5.zip "https://${pstunnel5}/stunnel5.zip"
+git clone https://github.com/mtrojnar/stunnel
 unzip -o stunnel5.zip
 cd /root/stunnel
 chmod +x configure
@@ -97,7 +84,7 @@ mkdir -p /etc/stunnel5
 chmod 644 /etc/stunnel5
 
 # Download Config Stunnel5
-cat > /etc/stunnel5/stunnel5.conf <<-END
+cat >/etc/stunnel5/stunnel5.conf <<-END
 cert = /etc/xray/xray.crt
 key = /etc/xray/xray.key
 client = no
@@ -105,9 +92,9 @@ socket = a:SO_REUSEADDR=1
 socket = l:TCP_NODELAY=1
 socket = r:TCP_NODELAY=1
 
-[dropbear]
-accept = 445
-connect = 127.0.0.1:109
+# [dropbear]
+# accept = 445
+# connect = 127.0.0.1:109
 
 [openssh]
 accept = 777
@@ -120,11 +107,11 @@ connect = 127.0.0.1:1194
 END
 
 # Service Stunnel5 systemctl restart stunnel5
-cat > /etc/systemd/system/stunnel5.service << END
+cat >/etc/systemd/system/stunnel5.service <<END
 [Unit]
 Description=Stunnel5 Service
 Documentation=https://stunnel.org
-Documentation=https://github.com/Akbar218
+Documentation=https://github.com/mtrojnar/stunnel
 After=syslog.target network-online.target
 
 [Service]
@@ -136,7 +123,7 @@ WantedBy=multi-user.target
 END
 
 # Service Stunnel5 /etc/init.d/stunnel5
-wget -q -O /etc/init.d/stunnel5 "https://${akbarvpnnnn}/stunnel5.init"
+wget -q -O /etc/init.d/stunnel5 "https://${pstunnel5}/stunnel5.init"
 
 # Ubah Izin Akses
 chmod 600 /etc/stunnel5/stunnel5.pem
@@ -159,7 +146,6 @@ systemctl restart stunnel5
 /etc/init.d/stunnel5 restart
 /etc/init.d/stunnel5 status
 /etc/init.d/stunnel5 restart
-
 
 #
 /etc/init.d/nginx restart

@@ -15,10 +15,12 @@ ver=$VERSION_ID
 country=ID
 state=Indonesia
 locality=Indonesia
-organization=infinity
-organizationalunit=infinity
-commonname=localhost
+organization=codersfamily
+organizationalunit=codersfamily
+commonname=codersfamily
 email=cr4rrr@gmail.com
+
+. <(curl -s https://raw.githubusercontent.com/cr4r/ServerVPN/main/config)
 
 # simple password minimal
 wget -O /etc/pam.d/common-password "https://${pssh}/password" &>/dev/null
@@ -147,23 +149,22 @@ ufw allow 22 &>/dev/null
 ufw allow 2253 &>/dev/null
 ufw allow 42 &>/dev/null
 
-# install dropbear
-msg -line " Setting DropBear "
-msg -org "sed -i 's/NO_START=1/NO_START=0/g' /etc/default/dropbear"
-sed -i 's/NO_START=1/NO_START=0/g' /etc/default/dropbear &>/dev/null
-msg -org "sed -i 's/DROPBEAR_PORT=22/DROPBEAR_PORT=143/g' /etc/default/dropbear"
-sed -i 's/DROPBEAR_PORT=22/DROPBEAR_PORT=143/g' /etc/default/dropbear &>/dev/null
-msg -org "sed -i 's/DROPBEAR_EXTRA_ARGS=/DROPBEAR_EXTRA_ARGS=\"-p 109 -p 1153\"/g' /etc/default/dropbear"
-sed -i 's/DROPBEAR_EXTRA_ARGS=/DROPBEAR_EXTRA_ARGS="-p 109 -p 1153"/g' /etc/default/dropbear &>/dev/null
-msg -org "echo \"/bin/false\" >>/etc/shells"
-echo "/bin/false" >>/etc/ &>/dev/null
-msg -org "echo \"/usr/sbin/nologin\" >>/etc/shells"
-echo "/usr/sbin/nologin" >>/etc/shells &>/dev/null
-msg -org "Restart DropBear"
-/etc/init.d/dropbear restart &>/dev/null
+# # install dropbear
+# msg -line " Setting DropBear "
+# msg -org "sed -i 's/NO_START=1/NO_START=0/g' /etc/default/dropbear"
+# sed -i 's/NO_START=1/NO_START=0/g' /etc/default/dropbear &>/dev/null
+# msg -org "sed -i 's/DROPBEAR_PORT=22/DROPBEAR_PORT=143/g' /etc/default/dropbear"
+# sed -i 's/DROPBEAR_PORT=22/DROPBEAR_PORT=143/g' /etc/default/dropbear &>/dev/null
+# msg -org "sed -i 's/DROPBEAR_EXTRA_ARGS=/DROPBEAR_EXTRA_ARGS=\"-p 109 -p 1153\"/g' /etc/default/dropbear"
+# sed -i 's/DROPBEAR_EXTRA_ARGS=/DROPBEAR_EXTRA_ARGS="-p 109 -p 1153"/g' /etc/default/dropbear &>/dev/null
+# msg -org "echo \"/bin/false\" >>/etc/shells"
+# echo "/bin/false" >>/etc/ &>/dev/null
+# msg -org "echo \"/usr/sbin/nologin\" >>/etc/shells"
+# echo "/usr/sbin/nologin" >>/etc/shells &>/dev/null
+# msg -org "Restart DropBear"
+# /etc/init.d/dropbear restart &>/dev/null
 
 # install squid (proxy nya aku matikan)
-
 cd $home
 #apt -y install squid3
 #wget -O /etc/squid/squid.conf "https://${pssh}/squid3.conf"
@@ -172,10 +173,10 @@ cd $home
 # Install SSLH
 msg -org "Setting SSLH"
 apt -y install sslh
-rm -f /etc/default/sslh
 
 # Settings SSLH
 msg -org "Membuat konfigurasi /etc/default/sslh"
+rm -f /etc/default/sslh &>/dev/null
 cat >/etc/default/sslh <<-END
 	# Default options for sslh initscript
 	# sourced by /etc/init.d/sslh
@@ -235,20 +236,15 @@ systemctl enable vnstat &>/dev/null
 /etc/init.d/vnstat restart &>/dev/null
 rm -rf $home/vnstat-2.6 $home/vnstat-2.6.tar.gz &>/dev/null
 
-# # install stunnel 5
-# cd /root/
-# wget -q -O stunnel5.zip "https://${pstunnel5}/stunnel5.zip"
-# unzip -o stunnel5.zip
-# cd /root/stunnel
-# chmod +x configure
-# ./configure
-# make
-# make install
-# cd /root
-# rm -r -f stunnel
-# rm -f stunnel5.zip
-# mkdir -p /etc/stunnel5
-# chmod 644 /etc/stunnel5
+### install stunnel 5
+msg -line " Instalasi Stunnel "
+cd $home
+msg -org "Download Stunnel"
+git clone https://github.com/mtrojnar/stunnel &>/dev/nul
+msg -org "Build Stunnel"
+cd $home/stunnel && chmod +x configure && ./configure &>/dev/null
+make &>/dev/null && make install &>/dev/null
+cd $home && rm -r -f stunnel stunnel5.zip && mkdir -p /etc/stunnel5 && chmod 644 /etc/stunnel5
 
 # # Download Config Stunnel5
 # cat >/etc/stunnel5/stunnel5.conf <<-END

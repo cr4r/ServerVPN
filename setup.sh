@@ -15,6 +15,9 @@
 	. <(curl -s https://raw.githubusercontent.com/cr4r/ServerVPN/main/config)
 	rm -rf $home &>/dev/null
 
+msg -red "Menginstall package tambahan :)"
+	inst_comp pv
+
 	mkdir -p $home && cd $home
 
 	msg -warn "Install dan menghidupkan Firewall (UFW)!"
@@ -34,35 +37,6 @@
 	PURPLE='\033[0;35m'
 	CYAN='\033[0;36m'
 	LIGHT='\033[0;37m'
-	# ==========================================
-	# Link Hosting Kalian Untuk Ssh Vpn
-	export pssh="${rawRepo}/ssh"
-	# Link Hosting Kalian Untuk Sstp
-	export psstp="${rawRepo}/sstp"
-	# Link Hosting Kalian Untuk Ssr
-	export pssr="${rawRepo}/ssr"
-	# Link Hosting Kalian Untuk Shadowsocks
-	export psocks="${rawRepo}/shadowsocks"
-	# Link Hosting Kalian Untuk Wireguard
-	export pwrguard="${rawRepo}/wireguard"
-	# Link Hosting Kalian Untuk Xray
-	export pxray="${rawRepo}/xray"
-	# Link Hosting Kalian Untuk Ipsec
-	export pipsec="${rawRepo}/ipsec"
-	# Link Hosting Kalian Untuk Backup
-	export pbackup="${rawRepo}/backup"
-	# Link Hosting Kalian Untuk Websocket
-	export pwst="${rawRepo}/websocket"
-	# Link Hosting Kalian Untuk Ohp
-	export pohp="${rawRepo}/ohp"
-	# Link Hosting Kalian Untuk trojan-go
-	export ptrojango="${rawRepo}/trojango"
-	# Link Hosting Kalian Untuk stunnel5
-	export pstunnel5="${rawRepo}/stunnel5"
-	# Link Hosting Kalian Untuk sldns
-	export psldns="${rawRepo}/SLDNS"
-	# Link Hosting Kalian Untuk sldns
-	export psslh="${rawRepo}/sslh-fix"
 	# Getting
 	clear
 

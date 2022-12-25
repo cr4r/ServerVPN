@@ -18,14 +18,14 @@ mkdir -p /etc/v2ray
 mkdir -p /etc/slowdns
 
 while [[ $konfirmDomain != @(s|S|y|Y|n|N|t|T) ]]; do
-  msg -ne "Ada domain sendiri (Y/T) ? " && read konfirmDomain
+  tanya "Ada domain sendiri (Y/T)" konfirmDomain
   tput cuu1 && tput dl1
 done
 
 if [[ $konfirmDomain == @(s|S|y|Y) ]]; then
   msg -org "IP VPS Anda\t: $(msg -gr $IP)"
   while [[ $SUB_DOMAIN == "" ]]; do
-    msg -ne "Domain yang diinginkan: " && read SUB_DOMAIN
+    tanya "Domain yang diinginkan"SUB_DOMAIN
     tput cuu1 && tput dl1
   done
 
@@ -36,7 +36,7 @@ if [[ $konfirmDomain == @(s|S|y|Y) ]]; then
   pause
 
   while [[ $NS_DOMAIN == "" ]]; do
-    msg -ne "NS Domain yang diinginkan: " && read NS_DOMAIN
+    tanya "NS Domain yang diinginkan" NS_DOMAIN
     tput cuu1 && tput dl1
   done
   msg -line " Silahkan buat NS Domain di manajer domain "
