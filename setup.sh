@@ -15,9 +15,6 @@
 	. <(curl -s https://raw.githubusercontent.com/cr4r/ServerVPN/main/config)
 	rm -rf $home &>/dev/null
 
-msg -red "Menginstall package tambahan :)"
-	inst_comp pv
-
 	mkdir -p $home && cd $home
 
 	msg -warn "Install dan menghidupkan Firewall (UFW)!"
@@ -61,9 +58,9 @@ msg -red "Menginstall package tambahan :)"
 	# . ${HomeRepo}/xray/ins-xray.sh
 
 	# #install ssh ovpn ###############################################>
-	# msg -line " Install ssh ovpn "
-	# # . <(curl -s ${pssh}/ssh-vpn.sh) ### Belum Fix
-	# . ${HomeRepo}/ssh/ssh-vpn.sh
+	msg -line " Install ssh ovpn "
+	# . <(curl -s ${pssh}/ssh-vpn.sh) ### Belum Fix
+	. ${pssh}/ssh-vpn.sh
 
 	# wget ${psstp}/sstp.sh && chmod +x sstp.sh && screen -S sstp ./sstp.sh
 	# #install ssr
@@ -104,13 +101,13 @@ msg -red "Menginstall package tambahan :)"
 	echo "   >>> Service & Port" | tee -a log-install.txt
 	echo "   - SlowDNS SSH             : ALL Port SSH" | tee -a log-install.txt
 	echo "   - OpenSSH                 : 22, 2253" | tee -a log-install.txt
-	# echo "   - OpenVPN                 : TCP 1194, UDP 2200, SSL 990" | tee -a log-install.txt
-	# echo "   - Stunnel5                : 443, 445" | tee -a log-install.txt
+	echo "   - OpenVPN                 : TCP 1194, UDP 2200, SSL 990" | tee -a log-install.txt
+	echo "   - Stunnel5                : 443, 445" | tee -a log-install.txt
 	# echo "   - Dropbear                : 443, 109, 143" | tee -a log-install.txt
 	echo "   - CloudFront Websocket    : " | tee -a log-install.txt
-	# echo "   - SSH Websocket TLS       : 443" | tee -a log-install.txt
-	# echo "   - SSH Websocket HTTP      : 8880" | tee -a log-install.txt
-	# echo "   - Websocket OpenVPN       : 2086" | tee -a log-install.txt
+	echo "   - SSH Websocket TLS       : 443" | tee -a log-install.txt
+	echo "   - SSH Websocket HTTP      : 8880" | tee -a log-install.txt
+	echo "   - Websocket OpenVPN       : 2086" | tee -a log-install.txt
 	# echo "   - Squid Proxy             : 3128, 8080" | tee -a log-install.txt
 	echo "   - Badvpn                  : 7100, 7200, 7300" | tee -a log-install.txt
 	echo "   - Nginx                   : 89" | tee -a log-install.txt

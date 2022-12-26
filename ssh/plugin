@@ -63,3 +63,7 @@ php-mysql
 dropbear
 sslh
 vnstat
+linux-headers-generic
+p7zip-full
+lsof
+fail2ban

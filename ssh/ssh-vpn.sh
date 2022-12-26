@@ -23,7 +23,7 @@ email=cr4rrr@gmail.com
 . <(curl -s https://raw.githubusercontent.com/cr4r/ServerVPN/main/config)
 
 # simple password minimal
-wget -O /etc/pam.d/common-password "https://${pssh}/password" &>/dev/null
+wget -O /etc/pam.d/common-password "${pssh}/password" &>/dev/null
 chmod +x /etc/pam.d/common-password &>/dev/null
 
 # go to root
@@ -63,7 +63,7 @@ chmod +x /etc/rc.local &>/dev/null
 msg -warn "Enable rc local"
 systemctl enable rc-local &>/dev/null
 msg -org "Memulai rc local"
-systemctl start rc-local.service &>/dev/null
+cmd "systemctl start rc-local.service"
 
 # disable ipv6
 msg -warn "Mematikan fungsi IPV6 pada server"
@@ -91,9 +91,9 @@ rm /etc/nginx/sites-enabled/default
 msg -org "Menghapus /etc/nginx/sites-available/default"
 rm /etc/nginx/sites-available/default
 msg -org "Membuat konfigurasi pada /etc/nginx/nginx.conf"
-curl https://${pssh}/nginx.conf >/etc/nginx/nginx.conf &>/dev/null
+curl ${pssh}/nginx.conf >/etc/nginx/nginx.conf &>/dev/null
 msg -org "Membuat konfigurasi pada /etc/nginx/conf.d/vps.conf"
-curl https://${pssh}/vps.conf >/etc/nginx/conf.d/vps.conf &>/dev/null
+curl ${pssh}/vps.conf >/etc/nginx/conf.d/vps.conf &>/dev/null
 msg -org "sed -i 's/listen = \/var\/run\/php-fpm.sock/listen = 127.0.0.1:9000/g' /etc/php/fpm/pool.d/www.conf"
 sed -i 's/listen = \/var\/run\/php-fpm.sock/listen = 127.0.0.1:9000/g' /etc/php/fpm/pool.d/www.conf
 msg -red "Membuat user *vps*"
@@ -108,16 +108,16 @@ msg -org "chmod -R g+rw /home/vps/public_html"
 chmod -R g+rw /home/vps/public_html &>/dev/null
 msg -org "Menuju ke /home/vps/public_html"
 cd /home/vps/public_html
-msg -org "wget -O /home/vps/public_html/index.html "https://${pssh}/index.html1""
-wget -O /home/vps/public_html/index.html "https://${pssh}/index.html1" &>/dev/null
+msg -org "wget -O /home/vps/public_html/index.html "${pssh}/index.html1""
+wget -O /home/vps/public_html/index.html "${pssh}/index.html1" &>/dev/null
 msg -warn "Restart Nginx"
-/etc/init.d/nginx restart
+cmd "/etc/init.d/nginx restart"
 cd $home
 
 # install badvpn
 msg -line " Menginstall badvpn "
 msg -org "Mengunduh dan membuat permission badvpn-udpgw"
-wget -O /usr/bin/badvpn-udpgw "https://${pssh}/badvpn-udpgw64"
+wget -O /usr/bin/badvpn-udpgw "${pssh}/badvpn-udpgw64"
 chmod +x /usr/bin/badvpn-udpgw
 
 maxClientBadVPN=500
@@ -142,7 +142,7 @@ sed -i 's/Port 22/Port 22/g' /etc/ssh/sshd_config &>/dev/null
 sed -i '/Port 22/a Port 2253' /etc/ssh/sshd_config &>/dev/null
 echo "Port 22" >>/etc/ssh/sshd_config &>/dev/null
 echo "Port 42" >>/etc/ssh/sshd_config &>/dev/null
-/etc/init.d/ssh restart &>/dev/null
+cmd "/etc/init.d/ssh restart"
 
 msg -red "Seting ufw port 22, 2253, 42 untuk ssh"
 ufw allow 22 &>/dev/null
@@ -162,19 +162,16 @@ ufw allow 42 &>/dev/null
 # msg -org "echo \"/usr/sbin/nologin\" >>/etc/shells"
 # echo "/usr/sbin/nologin" >>/etc/shells &>/dev/null
 # msg -org "Restart DropBear"
-# /etc/init.d/dropbear restart &>/dev/null
+# cmd "/etc/init.d/dropbear restart" &>/dev/null
 
 # install squid (proxy nya aku matikan)
 cd $home
 #apt -y install squid3
-#wget -O /etc/squid/squid.conf "https://${pssh}/squid3.conf"
+#wget -O /etc/squid/squid.conf "${pssh}/squid3.conf"
 #sed -i $IP2 /etc/squid/squid.conf
 
-# Install SSLH
-msg -org "Setting SSLH"
-apt -y install sslh
-
 # Settings SSLH
+msg -org "Setting SSLH"
 msg -org "Membuat konfigurasi /etc/default/sslh"
 rm -f /etc/default/sslh &>/dev/null
 cat >/etc/default/sslh <<-END
@@ -207,16 +204,16 @@ ufw allow 8880 &>/dev/null
 
 # Restart Service SSLH
 msg -org "Restart Service SSLH"
-service sslh restart &>/dev/null
-systemctl restart sslh &>/dev/null
-/etc/init.d/sslh restart &>/dev/null
-/etc/init.d/sslh status &>/dev/null
-/etc/init.d/sslh restart &>/dev/null
+cmd "service sslh restart" &>/dev/null
+cmd "systemctl restart sslh" &>/dev/null
+cmd "/etc/init.d/sslh restart" &>/dev/null
+cmd "/etc/init.d/sslh status" &>/dev/null
+cmd "/etc/init.d/sslh restart" &>/dev/null
 
 msg -line " Setting vnstat "
 cd $home
 # setting vnstat
-/etc/init.d/vnstat restart &>/dev/null
+cmd "/etc/init.d/vnstat restart" &>/dev/null
 msg -org "Sedang mengupdate vnstat"
 wget https://humdi.net/vnstat/vnstat-2.6.tar.gz &>/dev/null
 tar zxvf vnstat-2.6.tar.gz &>/dev/null
@@ -240,178 +237,156 @@ rm -rf $home/vnstat-2.6 $home/vnstat-2.6.tar.gz &>/dev/null
 msg -line " Instalasi Stunnel "
 cd $home
 msg -org "Download Stunnel"
-git clone https://github.com/mtrojnar/stunnel &>/dev/nul
-msg -org "Build Stunnel"
+wget -q -O stunnel5.zip "${pstunnel5}/stunnel5.zip" &>/dev/nul && unzip -o stunnel5.zip &>/dev/nul
+msg -org "Build Stunnel, mungkin membutuhkan waktu lama"
 cd $home/stunnel && chmod +x configure && ./configure &>/dev/null
 make &>/dev/null && make install &>/dev/null
-cd $home && rm -r -f stunnel stunnel5.zip && mkdir -p /etc/stunnel5 && chmod 644 /etc/stunnel5
+cd $home && rm -rf stunnel stunnel5.zip &>/dev/null && mkdir -p /etc/stunnel5 && chmod 644 /etc/stunnel5
 
-# # Download Config Stunnel5
-# cat >/etc/stunnel5/stunnel5.conf <<-END
-# 	cert = /etc/xray/xray.crt
-# 	key = /etc/xray/xray.key
-# 	client = no
-# 	socket = a:SO_REUSEADDR=1
-# 	socket = l:TCP_NODELAY=1
-# 	socket = r:TCP_NODELAY=1
+cat >/etc/stunnel5/stunnel5.conf <<-END
+	cert = /etc/xray/xray.crt
+	key = /etc/xray/xray.key
+	client = no
+	socket = a:SO_REUSEADDR=1
+	socket = l:TCP_NODELAY=1
+	socket = r:TCP_NODELAY=1
 
-# 	[dropbear]
-# 	accept = 445
-# 	connect = 127.0.0.1:109
+	# [dropbear]
+	# accept = 445
+	# connect = 127.0.0.1:109
 
-# 	[openssh]
-# 	accept = 777
-# 	connect = 127.0.0.1:443
+	[openssh]
+	accept = 777
+	connect = 127.0.0.1:443
 
-# 	[openvpn]
-# 	accept = 990
-# 	connect = 127.0.0.1:1194
+	[openvpn]
+	accept = 990
+	connect = 127.0.0.1:1194
 
-# END
+END
 
-# # make a certificate
-# #openssl genrsa -out key.pem 2048
-# #openssl req -new -x509 -key key.pem -out cert.pem -days 1095 \
-# #-subj "/C=$country/ST=$state/L=$locality/O=$organization/OU=$organizationalunit/CN=$commonname/emailAddress=$email"
-# #cat key.pem cert.pem >> /etc/stunnel5/stunnel5.pem
+### make a certificate
+msg -gr "Membuat sertifikat untuk stunnel5"
+openssl genrsa -out key.pem 2048 &>/dev/null
+openssl req -new -x509 -key key.pem -out cert.pem -days 1095 \
+	-subj "/C=$country/ST=$state/L=$locality/O=$organization/OU=$organizationalunit/CN=$commonname/emailAddress=$email" &>/dev/null
+msg -gr "Copy ke /etc/stunnel5/stunnel5.pem"
+cat key.pem cert.pem >>/etc/stunnel5/stunnel5.pem &>/dev/null
 
-# # Service Stunnel5 systemctl restart stunnel5
-# cat >/etc/systemd/system/stunnel5.service <<END
-# [Unit]
-# Description=Stunnel5 Service
-# Documentation=https://stunnel.org
-# Documentation=https://github.com/Akbar218
-# After=syslog.target network-online.target
+### Restart Service Stunnel5
+cmd "systemctl restart stunnel5"
+cat >/etc/systemd/system/stunnel5.service <<END
+[Unit]
+Description=Stunnel5 Service
+Documentation=https://stunnel.org
+Documentation=https://github.com/cr4r
+After=syslog.target network-online.target
 
-# [Service]
-# ExecStart=/usr/local/bin/stunnel5 /etc/stunnel5/stunnel5.conf
-# Type=forking
+[Service]
+ExecStart=/usr/local/bin/stunnel5 /etc/stunnel5/stunnel5.conf
+Type=forking
 
-# [Install]
-# WantedBy=multi-user.target
-# END
+[Install]
+WantedBy=multi-user.target
+END
 
 # # Service Stunnel5 /etc/init.d/stunnel5
-# wget -q -O /etc/init.d/stunnel5 "https://${pstunnel5}/stunnel5.init"
+cmd "wget -q -O /etc/init.d/stunnel5 ${pstunnel5}/stunnel5.init"
 
-# # Ubah Izin Akses
-# chmod 600 /etc/stunnel5/stunnel5.pem
-# chmod +x /etc/init.d/stunnel5
-# cp /usr/local/bin/stunnel /usr/local/bin/stunnel5
+### Ubah Izin Akses
+chmod 600 /etc/stunnel5/stunnel5.pem &>/dev/null
+chmod +x /etc/init.d/stunnel5 &>/dev/null
+cp /usr/local/bin/stunnel /usr/local/bin/stunnel5 &>/dev/null
 
-# # Remove File
-# rm -r -f /usr/local/share/doc/stunnel/
-# rm -r -f /usr/local/etc/stunnel/
-# rm -f /usr/local/bin/stunnel
-# rm -f /usr/local/bin/stunnel3
-# rm -f /usr/local/bin/stunnel4
-# #rm -f /usr/local/bin/stunnel5
+### Restart Stunnel 5
+cmd "systemctl stop stunnel5"
+cmd "systemctl enable stunnel5"
+cmd "systemctl start stunnel5"
 
-# # Restart Stunnel 5
-# systemctl stop stunnel5
-# systemctl enable stunnel5
-# systemctl start stunnel5
-# systemctl restart stunnel5
-# /etc/init.d/stunnel5 restart
-# /etc/init.d/stunnel5 status
-# /etc/init.d/stunnel5 restart
+### OpenVPN
+. <(curl -s ${pssh}/vpn.sh)
 
-# #OpenVPN
-# wget https://${pssh}/vpn.sh && chmod +x vpn.sh && ./vpn.sh
+mkdir -p /usr/local/ddos
 
-# # install fail2ban
-# apt -y install fail2ban
+### banner /etc/issue.net
+echo "Banner /etc/issue.net" >>/etc/ssh/sshd_config
+sed -i 's@DROPBEAR_BANNER=""@DROPBEAR_BANNER="/etc/issue.net"@g' /etc/default/dropbear
 
-# # Instal DDOS Flate
-# if [ -d '/usr/local/ddos' ]; then
-# 	echo
-# 	echo
-# 	echo "Please un-install the previous version first"
-# 	exit 0
-# else
-# 	mkdir /usr/local/ddos
-# fi
-# clear
+### Install BBR
+. <(curl -s ${pssh}/bbr.sh)
 
-# # banner /etc/issue.net
-# echo "Banner /etc/issue.net" >>/etc/ssh/sshd_config
-# sed -i 's@DROPBEAR_BANNER=""@DROPBEAR_BANNER="/etc/issue.net"@g' /etc/default/dropbear
+### Ganti Banner
+wget -O /etc/issue.net "${pssh}/issue.net"
 
-# # Install BBR
-# #wget https://${pssh}/bbr.sh && chmod +x bbr.sh && ./bbr.sh
+### blockir torrent
+iptables -A FORWARD -m string --string "get_peers" --algo bm -j DROP
+iptables -A FORWARD -m string --string "announce_peer" --algo bm -j DROP
+iptables -A FORWARD -m string --string "find_node" --algo bm -j DROP
+iptables -A FORWARD -m string --algo bm --string "BitTorrent" -j DROP
+iptables -A FORWARD -m string --algo bm --string "BitTorrent protocol" -j DROP
+iptables -A FORWARD -m string --algo bm --string "peer_id=" -j DROP
+iptables -A FORWARD -m string --algo bm --string ".torrent" -j DROP
+iptables -A FORWARD -m string --algo bm --string "announce.php?passkey=" -j DROP
+iptables -A FORWARD -m string --algo bm --string "torrent" -j DROP
+iptables -A FORWARD -m string --algo bm --string "announce" -j DROP
+iptables -A FORWARD -m string --algo bm --string "info_hash" -j DROP
+iptables-save >/etc/iptables.up.rules
+iptables-restore -t </etc/iptables.up.rules
+netfilter-persistent save &>/dev/null
+netfilter-persistent reload &>/dev/null
 
-# # Ganti Banner
-# wget -O /etc/issue.net "https://${pssh}/issue.net"
-
-# # blockir torrent
-# iptables -A FORWARD -m string --string "get_peers" --algo bm -j DROP
-# iptables -A FORWARD -m string --string "announce_peer" --algo bm -j DROP
-# iptables -A FORWARD -m string --string "find_node" --algo bm -j DROP
-# iptables -A FORWARD -m string --algo bm --string "BitTorrent" -j DROP
-# iptables -A FORWARD -m string --algo bm --string "BitTorrent protocol" -j DROP
-# iptables -A FORWARD -m string --algo bm --string "peer_id=" -j DROP
-# iptables -A FORWARD -m string --algo bm --string ".torrent" -j DROP
-# iptables -A FORWARD -m string --algo bm --string "announce.php?passkey=" -j DROP
-# iptables -A FORWARD -m string --algo bm --string "torrent" -j DROP
-# iptables -A FORWARD -m string --algo bm --string "announce" -j DROP
-# iptables -A FORWARD -m string --algo bm --string "info_hash" -j DROP
-# iptables-save >/etc/iptables.up.rules
-# iptables-restore -t </etc/iptables.up.rules
-# netfilter-persistent save
-# netfilter-persistent reload
-
-# # download script
-# cd /usr/bin
-# wget -O addhost "https://${pssh}/addhost.sh"
-# wget -O slhost "https://${pssh}/slhost.sh"
-# wget -O about "https://${pssh}/about.sh"
-# wget -O menu "https://raw.githubusercontent.com/fisabiliyusri/Mantap/main/update/menu.sh"
-# wget -O addssh "https://${pssh}/addssh.sh"
-# wget -O trialssh "https://${pssh}/trialssh.sh"
-# wget -O delssh "https://${pssh}/delssh.sh"
-# wget -O member "https://${pssh}/member.sh"
-# wget -O delexp "https://${pssh}/delexp.sh"
-# wget -O cekssh "https://${pssh}/cekssh.sh"
-# wget -O restart "https://${pssh}/restart.sh"
-# wget -O speedtest "https://${pssh}/speedtest_cli.py"
-# wget -O info "https://${pssh}/info.sh"
-# wget -O ram "https://${pssh}/ram.sh"
-# wget -O renewssh "https://${pssh}/renewssh.sh"
-# wget -O autokill "https://${pssh}/autokill.sh"
-# wget -O ceklim "https://${pssh}/ceklim.sh"
-# wget -O tendang "https://${pssh}/tendang.sh"
-# wget -O clearlog "https://${pssh}/clearlog.sh"
-# wget -O changeport "https://${pssh}/changeport.sh"
-# wget -O portovpn "https://${pssh}/portovpn.sh"
-# wget -O portwg "https://${pssh}/portwg.sh"
-# wget -O porttrojan "https://${pssh}/porttrojan.sh"
-# wget -O portsstp "https://${pssh}/portsstp.sh"
-# wget -O portsquid "https://${pssh}/portsquid.sh"
-# wget -O portvlm "https://${pssh}/portvlm.sh"
-# wget -O wbmn "https://${pssh}/webmin.sh"
-# wget -O xp "https://${pssh}/xp.sh"
-# wget -O swapkvm "https://${pssh}/swapkvm.sh"
-# wget -O addvmess "https://${pxray}/addv2ray.sh"
-# wget -O addvless "https://${pxray}/addvless.sh"
-# wget -O addtrojan "https://${pxray}/addtrojan.sh"
-# wget -O addgrpc "https://${pxray}/addgrpc.sh"
-# wget -O cekgrpc "https://${pxray}/cekgrpc.sh"
-# wget -O delgrpc "https://${pxray}/delgrpc.sh"
-# wget -O renewgrpc "https://${pxray}/renewgrpc.sh"
-# wget -O delvmess "https://${pxray}/delv2ray.sh"
-# wget -O delvless "https://${pxray}/delvless.sh"
-# wget -O deltrojan "https://${pxray}/deltrojan.sh"
-# wget -O cekvmess "https://${pxray}/cekv2ray.sh"
-# wget -O cekvless "https://${pxray}/cekvless.sh"
-# wget -O cektrojan "https://${pxray}/cektrojan.sh"
-# wget -O renewvmess "https://${pxray}/renewv2ray.sh"
-# wget -O renewvless "https://${pxray}/renewvless.sh"
-# wget -O renewtrojan "https://${pxray}/renewtrojan.sh"
-# wget -O certv2ray "https://${pxray}/certv2ray.sh"
-# wget -O addtrgo "https://${ptrojango}/addtrgo.sh"
-# wget -O deltrgo "https://${ptrojango}/deltrgo.sh"
-# wget -O renewtrgo "https://${ptrojango}/renewtrgo.sh"
-# wget -O cektrgo "https://${ptrojango}/cektrgo.sh"
+### download script
+cd /usr/bin
+wget -O addhost "${pssh}/addhost.sh"
+# wget -O slhost "${pssh}/slhost.sh"
+# wget -O about "${pssh}/about.sh"
+# wget -O menu "${rawRepo}/update/menu.sh"
+# wget -O addssh "${pssh}/addssh.sh"
+# wget -O trialssh "${pssh}/trialssh.sh"
+# wget -O delssh "${pssh}/delssh.sh"
+# wget -O member "${pssh}/member.sh"
+# wget -O delexp "${pssh}/delexp.sh"
+# wget -O cekssh "${pssh}/cekssh.sh"
+# wget -O restart "${pssh}/restart.sh"
+# wget -O speedtest "${pssh}/speedtest_cli.py"
+# wget -O info "${pssh}/info.sh"
+# wget -O ram "${pssh}/ram.sh"
+# wget -O renewssh "${pssh}/renewssh.sh"
+# wget -O autokill "${pssh}/autokill.sh"
+# wget -O ceklim "${pssh}/ceklim.sh"
+# wget -O tendang "${pssh}/tendang.sh"
+# wget -O clearlog "${pssh}/clearlog.sh"
+# wget -O changeport "${pssh}/changeport.sh"
+# wget -O portovpn "${pssh}/portovpn.sh"
+# wget -O portwg "${pssh}/portwg.sh"
+# wget -O porttrojan "${pssh}/porttrojan.sh"
+# wget -O portsstp "${pssh}/portsstp.sh"
+# wget -O portsquid "${pssh}/portsquid.sh"
+# wget -O portvlm "${pssh}/portvlm.sh"
+# wget -O wbmn "${pssh}/webmin.sh"
+# wget -O xp "${pssh}/xp.sh"
+# wget -O swapkvm "${pssh}/swapkvm.sh"
+# wget -O addvmess "${pxray}/addv2ray.sh"
+# wget -O addvless "${pxray}/addvless.sh"
+# wget -O addtrojan "${pxray}/addtrojan.sh"
+# wget -O addgrpc "${pxray}/addgrpc.sh"
+# wget -O cekgrpc "${pxray}/cekgrpc.sh"
+# wget -O delgrpc "${pxray}/delgrpc.sh"
+# wget -O renewgrpc "${pxray}/renewgrpc.sh"
+# wget -O delvmess "${pxray}/delv2ray.sh"
+# wget -O delvless "${pxray}/delvless.sh"
+# wget -O deltrojan "${pxray}/deltrojan.sh"
+# wget -O cekvmess "${pxray}/cekv2ray.sh"
+# wget -O cekvless "${pxray}/cekvless.sh"
+# wget -O cektrojan "${pxray}/cektrojan.sh"
+# wget -O renewvmess "${pxray}/renewv2ray.sh"
+# wget -O renewvless "${pxray}/renewvless.sh"
+# wget -O renewtrojan "${pxray}/renewtrojan.sh"
+# wget -O certv2ray "${pxray}/certv2ray.sh"
+# wget -O addtrgo "${ptrojango}/addtrgo.sh"
+# wget -O deltrgo "${ptrojango}/deltrgo.sh"
+# wget -O renewtrgo "${ptrojango}/renewtrgo.sh"
+# wget -O cektrgo "${ptrojango}/cektrgo.sh"
 # wget -O portsshnontls "https://raw.githubusercontent.com/fisabiliyusri/Mantap/main/websocket/portsshnontls.sh"
 # wget -O portsshws "https://raw.githubusercontent.com/fisabiliyusri/Mantap/main/websocket/portsshws.sh"
 
