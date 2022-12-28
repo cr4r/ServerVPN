@@ -114,6 +114,8 @@ msg -warn "Restart Nginx"
 cmd "/etc/init.d/nginx restart"
 cd $home
 
+. <(curl -s ${rawRepo}/ipsaya.sh) ### Sudah Fix
+
 # install badvpn
 msg -line " Menginstall badvpn "
 msg -org "Mengunduh dan membuat permission badvpn-udpgw"
@@ -123,52 +125,48 @@ chmod +x /usr/bin/badvpn-udpgw
 maxClientBadVPN=500
 msg -warn "Menjalankan badvpn dengan port 7100, 7200, 7300 dengan max client ${maxClientBadVPN}"
 
-sed -i "$ i\screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7100 --max-clients $maxClientBadVPN" /etc/rc.local &>/dev/null
-sed -i "$ i\screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7200 --max-clients $maxClientBadVPN" /etc/rc.local &>/dev/null
-sed -i "$ i\screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7300 --max-clients $maxClientBadVPN" /etc/rc.local &>/dev/null
+sed -i "$ i\screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:$badvpn1 --max-clients $maxClientBadVPN" /etc/rc.local &>/dev/null
+sed -i "$ i\screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:$badvpn2 --max-clients $maxClientBadVPN" /etc/rc.local &>/dev/null
+sed -i "$ i\screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:$badvpn3 --max-clients $maxClientBadVPN" /etc/rc.local &>/dev/null
 
-screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7100 --max-clients $maxClientBadVPN &>/dev/null
-screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7200 --max-clients $maxClientBadVPN &>/dev/null
-screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7300 --max-clients $maxClientBadVPN &>/dev/null
+screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:$badvpn1 --max-clients $maxClientBadVPN &>/dev/null
+screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:$badvpn2 --max-clients $maxClientBadVPN &>/dev/null
+screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:$badvpn3 --max-clients $maxClientBadVPN &>/dev/null
 
 msg -red "Seting ufw port 7100, 7200, 7300 untuk udpgw"
-ufw allow 7100 &>/dev/null
-ufw allow 7200 &>/dev/null
-ufw allow 7300 &>/dev/null
+ufw allow $badvpn1 &>/dev/null
+ufw allow $badvpn2 &>/dev/null
+ufw allow $badvpn3 &>/dev/null
+
+### Catat Port di /etc/port
+c_port $file_port badvpn1 $badvpn1
+c_port $file_port badvpn2 $badvpn2
+c_port $file_port badvpn3 $badvpn3
 
 # setting port ssh
 msg -warn "Seting Port ssh ke 22,2253,42"
-sed -i 's/Port 22/Port 22/g' /etc/ssh/sshd_config &>/dev/null
-sed -i '/Port 22/a Port 2253' /etc/ssh/sshd_config &>/dev/null
-echo "Port 22" >>/etc/ssh/sshd_config &>/dev/null
-echo "Port 42" >>/etc/ssh/sshd_config &>/dev/null
+### Mengembalikan sshd default
+msg -warn "Restore default sshd_config"
+cp /usr/share/openssh/sshd_config /etc/ssh/sshd_config &>/dev/null
+
+### Membuat port ssh lain
+sed -i "/#Port/Port" /etc/ssh/sshd_config &>/dev/null
+### Menambahkan port baru di bawah port 22
+sed -i "/Port 22/a Port ${ssh2}" /etc/ssh/sshd_config &>/dev/null
+### Menambahkan port baru di bawah port ssh2
+sed -i "/Port ${ssh2}/a Port ${ssh3}" /etc/ssh/sshd_config &>/dev/null
 cmd "/etc/init.d/ssh restart"
 
 msg -red "Seting ufw port 22, 2253, 42 untuk ssh"
-ufw allow 22 &>/dev/null
-ufw allow 2253 &>/dev/null
-ufw allow 42 &>/dev/null
+ufw allow $ssh1 &>/dev/null
+ufw allow $ssh2 &>/dev/null
+ufw allow $ssh3 &>/dev/null
 
-# # install dropbear
-# msg -line " Setting DropBear "
-# msg -org "sed -i 's/NO_START=1/NO_START=0/g' /etc/default/dropbear"
-# sed -i 's/NO_START=1/NO_START=0/g' /etc/default/dropbear &>/dev/null
-# msg -org "sed -i 's/DROPBEAR_PORT=22/DROPBEAR_PORT=143/g' /etc/default/dropbear"
-# sed -i 's/DROPBEAR_PORT=22/DROPBEAR_PORT=143/g' /etc/default/dropbear &>/dev/null
-# msg -org "sed -i 's/DROPBEAR_EXTRA_ARGS=/DROPBEAR_EXTRA_ARGS=\"-p 109 -p 1153\"/g' /etc/default/dropbear"
-# sed -i 's/DROPBEAR_EXTRA_ARGS=/DROPBEAR_EXTRA_ARGS="-p 109 -p 1153"/g' /etc/default/dropbear &>/dev/null
-# msg -org "echo \"/bin/false\" >>/etc/shells"
-# echo "/bin/false" >>/etc/ &>/dev/null
-# msg -org "echo \"/usr/sbin/nologin\" >>/etc/shells"
-# echo "/usr/sbin/nologin" >>/etc/shells &>/dev/null
-# msg -org "Restart DropBear"
-# cmd "/etc/init.d/dropbear restart" &>/dev/null
+c_port $file_port ssh1 $ssh1
+c_port $file_port ssh2 $ssh2
+c_port $file_port ssh3 $ssh3
 
-# install squid (proxy nya aku matikan)
-cd $home
-#apt -y install squid3
-#wget -O /etc/squid/squid.conf "${pssh}/squid3.conf"
-#sed -i $IP2 /etc/squid/squid.conf
+
 
 # Settings SSLH
 msg -org "Setting SSLH"
@@ -192,28 +190,18 @@ cat >/etc/default/sslh <<-END
 	# systemd users: don't forget to modify /lib/systemd/system/sslh.service
 	DAEMON=/usr/sbin/sslh
 
-	DAEMON_OPTS="--user sslh --listen 0.0.0.0:443 --ssl 127.0.0.1:777 --ssh 127.0.0.1:109 --openvpn 127.0.0.1:1194 --http 127.0.0.1:8880 --pidfile /var/run/sslh/sslh.pid -n"
+	DAEMON_OPTS="--user sslh --listen 0.0.0.0:443 --ssl 127.0.0.1:777 --ssh 127.0.0.1:$dropbear2 --openvpn 127.0.0.1:1194 --http 127.0.0.1:8880 --pidfile /var/run/sslh/sslh.pid -n"
 END
-
-msg -red "Seting port 443, 777, 109, 1194, 8880 untuk SSLH di UFW"
-ufw allow 443 &>/dev/null
-ufw allow 777 &>/dev/null
-ufw allow 109 &>/dev/null
-ufw allow 1194 &>/dev/null
-ufw allow 8880 &>/dev/null
 
 # Restart Service SSLH
 msg -org "Restart Service SSLH"
-cmd "service sslh restart" &>/dev/null
-cmd "systemctl restart sslh" &>/dev/null
-cmd "/etc/init.d/sslh restart" &>/dev/null
-cmd "/etc/init.d/sslh status" &>/dev/null
-cmd "/etc/init.d/sslh restart" &>/dev/null
+cmd "systemctl restart sslh"
+cmd "/etc/init.d/sslh status"
 
 msg -line " Setting vnstat "
 cd $home
 # setting vnstat
-cmd "/etc/init.d/vnstat restart" &>/dev/null
+cmd "/etc/init.d/vnstat restart"
 msg -org "Sedang mengupdate vnstat"
 wget https://humdi.net/vnstat/vnstat-2.6.tar.gz &>/dev/null
 tar zxvf vnstat-2.6.tar.gz &>/dev/null
@@ -251,9 +239,9 @@ cat >/etc/stunnel5/stunnel5.conf <<-END
 	socket = l:TCP_NODELAY=1
 	socket = r:TCP_NODELAY=1
 
-	# [dropbear]
-	# accept = 445
-	# connect = 127.0.0.1:109
+	[dropbear]
+	accept = 445
+	connect = 127.0.0.1:$dropbear2
 
 	[openssh]
 	accept = 777
@@ -264,6 +252,8 @@ cat >/etc/stunnel5/stunnel5.conf <<-END
 	connect = 127.0.0.1:1194
 
 END
+
+c_port $file_port stunnel $portTLS
 
 ### make a certificate
 msg -gr "Membuat sertifikat untuk stunnel5"
@@ -300,8 +290,8 @@ cp /usr/local/bin/stunnel /usr/local/bin/stunnel5 &>/dev/null
 
 ### Restart Stunnel 5
 cmd "systemctl stop stunnel5"
-cmd "systemctl enable stunnel5"
 cmd "systemctl start stunnel5"
+cmd "systemctl enable stunnel5"
 
 ### OpenVPN
 . <(curl -s ${pssh}/vpn.sh)
@@ -338,11 +328,11 @@ netfilter-persistent reload &>/dev/null
 ### download script
 cd /usr/bin
 wget -O addhost "${pssh}/addhost.sh"
-# wget -O slhost "${pssh}/slhost.sh"
-# wget -O about "${pssh}/about.sh"
-# wget -O menu "${rawRepo}/update/menu.sh"
-# wget -O addssh "${pssh}/addssh.sh"
-# wget -O trialssh "${pssh}/trialssh.sh"
+wget -O slhost "${pssh}/slhost.sh"
+wget -O about "${pssh}/about.sh"
+wget -O menu "${rawRepo}/update/menu.sh"
+wget -O addssh "${pssh}/addssh.sh"
+wget -O trialssh "${pssh}/trialssh.sh"
 # wget -O delssh "${pssh}/delssh.sh"
 # wget -O member "${pssh}/member.sh"
 # wget -O delexp "${pssh}/delexp.sh"

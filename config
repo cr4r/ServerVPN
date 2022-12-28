@@ -162,11 +162,44 @@ hapus_tool() {
 }
 
 tanya() {
-  read -p "$(msg -ne '$1 => ')" $2
+  read -p "$(msg -ne "$1 => ")" $2
 }
 
 cmd() {
   $@ &>/dev/null || msg -warn "Error saat $1" && exit 1
+}
+
+### Ganti port di file
+cari_port() {
+  filenya=$1
+  jenis_port=$2
+  if [[ -f $filenya ]]; then
+    hasil=$(cat ${filenya} | awk -F= "/^${jenis_port}/"'{ print $2 }')
+    if [[ -z $hasil ]]; then
+      echo 0
+    else
+      echo $hasil
+    fi
+  else
+    echo 0
+  fi
+}
+
+### => c_port $file_port badvpn1 7100
+c_port() {
+  filenya=$1
+  text1=$2
+  text2=$3
+  jadi="${text1}=${text2}"
+  if [[ -f $filenya ]]; then
+    if [[ $(cari_port $filenya $text1) != 0 ]]; then
+      sed -i "s/$text1=.*/$jadi/g" $filenya
+    else
+      echo $jadi >>$filenya
+    fi
+  else
+    echo "Tidak ada file"
+  fi
 }
 
 ### Export Function
@@ -182,6 +215,9 @@ export -f hapus_trojango
 export -f tanya
 export -f cmd
 export -f cek_port
+
+export -f cari_port
+export -f c_port
 
 ### Export Variabel
 export HomeRepo="/root/ServerVPN"
@@ -210,6 +246,6 @@ export ptrojango="${rawRepo}/trojango"
 export pstunnel5="${rawRepo}/stunnel5"
 export psldns="${rawRepo}/SLDNS"
 export psslh="${rawRepo}/sslh-fix"
-
+export file_port=/etc/port
 ### Jika ingin run function secara langsung
 $1

@@ -1,10 +1,13 @@
 #!/bin/bash
+. <(curl -s https://raw.githubusercontent.com/cr4r/ServerVPN/main/config)
 clear
+
 m="\033[0;1;36m"
 y="\033[0;1;37m"
 yy="\033[0;1;32m"
 yl="\033[0;1;33m"
 wh="\033[0m"
+
 echo -e "$y                  MENU UTAMA $wh"
 echo -e "$y            Script Mod By SL $wh"
 echo -e "$y-------------------------------------------------$wh"
@@ -31,98 +34,98 @@ echo -e "$yy 20$y. copyrepo (Salin Repo Script Mantap)$wh"
 echo -e "$yy 21$y. menuinfo (Untuk Mendapatkan Informasi)$wh"
 echo -e "$yy 22$y. Shadowsocks Plugin (Buat Akun)$wh"
 echo -e "$y-------------------------------------------------$wh"
-read -p "Select From Options [ 1 - 22 ] : " menu
+tanya "Select From Options [ 1 - 22 ]" menu
 case $menu in
 1)
-clear
-sshovpnmenu
-;;
+  clear
+  sshovpnmenu
+  ;;
 2)
-clear
-l2tpmenu
-;;
+  clear
+  l2tpmenu
+  ;;
 3)
-clear
-pptpmenu
-;;
+  clear
+  pptpmenu
+  ;;
 4)
-clear
-sstpmenu
-;;
+  clear
+  sstpmenu
+  ;;
 5)
-clear
-wgmenu
-;;
+  clear
+  wgmenu
+  ;;
 6)
-clear
-ssmenu
-;;
+  clear
+  ssmenu
+  ;;
 7)
-clear
-ssrmenu
-;;
+  clear
+  ssrmenu
+  ;;
 8)
-clear
-vmessmenu
-;;
+  clear
+  vmessmenu
+  ;;
 9)
-clear
-vlessmenu
-;;
+  clear
+  vlessmenu
+  ;;
 10)
-clear
-trmenu
-;;
+  clear
+  trmenu
+  ;;
 11)
-clear
-trgomenu
-;;
+  clear
+  trgomenu
+  ;;
 12)
-clear
-grpcmenu
-;;
+  clear
+  grpcmenu
+  ;;
 13)
-clear
-slowdnsmenu
-;;
+  clear
+  slowdnsmenu
+  ;;
 14)
-clear
-ipsaya
-;;
+  clear
+  ipsaya
+  ;;
 15)
-clear
-running
-;;
+  clear
+  running
+  ;;
 16)
-clear
-updatemenu
-;;
+  clear
+  updatemenu
+  ;;
 17)
-clear
-sl-fix
-;;
+  clear
+  sl-fix
+  ;;
 18)
-clear
-setmenu
-;;
+  clear
+  setmenu
+  ;;
 19)
-clear
-exit
-;;
+  clear
+  exit
+  ;;
 20)
-clear
-copyrepo
-;;
+  clear
+  copyrepo
+  ;;
 21)
-clear
-menuinfo
-;;
+  clear
+  menuinfo
+  ;;
 22)
-clear
-addss-p
-;;
+  clear
+  addss-p
+  ;;
 *)
-clear
-menu
-;;
+  clear
+  menu
+  ;;
 esac

@@ -128,7 +128,8 @@ pathV2ray="/worryfree/"
 pathVless=$pathV2ray
 portTLS=8443
 portNonTLS=8444
-portFallBack=8445
+portrojan=8445
+portrojango=2087
 cat >/etc/xray/config.json <<END
 {
   "log": {
@@ -287,7 +288,7 @@ cat >/etc/xray/config.json <<END
       }
     },
     {
-      "port": ${portFallBack},
+      "port": ${portrojan},
       "protocol": "trojan",
       "settings": {
         "clients": [
@@ -423,6 +424,7 @@ EOF
 ### Menambahkan port pada ufw untuk xray
 # # Accept port Xray
 msg -warn "Menambahkan port pada ufw untuk xray!"
+msg -red "$portTLS, $portNonTLS, $portFallBack"
 ufw allow ${portTLS}/tcp &>/dev/null
 ufw allow ${portTLS}/udp &>/dev/null
 ufw allow ${portNonTLS}/udp &>/dev/null
@@ -469,7 +471,7 @@ cat >/etc/trojan-go/config.json <<END
 {
   "run_type": "server",
   "local_addr": "0.0.0.0",
-  "local_port": 2086,
+  "local_port": $portrojango,
   "remote_addr": "127.0.0.1",
   "remote_port": 89,
   "log_level": 1,
@@ -556,8 +558,9 @@ $uuid
 END
 
 ### restart
-msg -org "ufw allow port 89"
-ufw allow 89 &>/dev/null
+msg -org "ufw allow port $portrojango"
+ufw allow $portrojango &>/dev/null
+
 msg -warn "Restart Service trojan GO"
 systemctl daemon-reload &>/dev/null
 systemctl stop trojan-go &>/dev/null
@@ -570,15 +573,21 @@ msg -line " Informasi tentang Xray "
 msg -warn "VMESS"
 msg -org "Servername : $(cat ${dir_xray}/domain)"
 msg -org "Port TLS : ${portTLS}"
-msg -org "Port TLS : ${portNonTLS}"
+msg -org "Port None TLS : ${portNonTLS}"
 msg -org "Port FallBack: ${portFallBack}"
 msg -line
 msg -warn "VMESS"
 msg -org "Servername : $(cat ${dir_xray}/domain)"
 msg -org "Port : 89"
 
+c_port $file_port xray_tls $portTLS
+c_port $file_port xray_nontls $portNonTLS
+c_port $file_port xray_trojan $portrojan
+c_port $file_port trojango $portrojango
+
 cat <<EOF >/etc/xray/port
-tls=${portTLS}
-nontls=${portNonTLS}
-fallback=${portFallBack}
+tls-xray=${portTLS}
+nontls-xray=${portNonTLS}
+xray_trojan=${portrojan}
+trojango=${portrojango}
 EOF

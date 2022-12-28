@@ -146,5 +146,7 @@ cmd "systemctl enable openvpn"
 cmd "systemctl start openvpn"
 cmd "/etc/init.d/openvpn restart"
 
+
+
 # Delete script
 history -c

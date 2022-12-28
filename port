@@ -1,0 +1,13 @@
+#!/bin/bash
+### Kumpulan Port untuk instalasi disini
+(
+  badvpn1=7100
+  badvpn2=7200
+  badvpn3=7300
+  ssh1=22
+  ssh2=2253
+  ssh3=42
+  dropbear1=445
+  dropbear2=109
+  dropbear3=143
+) | export

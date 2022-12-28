@@ -18,13 +18,19 @@ sldomain=$(cat /root/nsdomain)
 cdndomain=$(cat /root/awscdndomain)
 slkey=$(cat /etc/slowdns/server.pub)
 clear
-read -p "Username : " Login
-read -p "Password : " Pass
-read -p "Expired (Days): " masaaktif
 
-IP=$(wget -qO- ipinfo.io/ip);
-ws="$(cat ~/log-install.txt | grep -w "Websocket TLS" | cut -d: -f2|sed 's/ //g')"
-ws2="$(cat ~/log-install.txt | grep -w "Websocket None TLS" | cut -d: -f2|sed 's/ //g')"
+tanya "Username" Login
+tanya "Password" Pass
+tanya "Expired (Days)" masaaktif
+
+IP=$(wget -qO- ipinfo.io/ip)
+
+portXray=$(cat /etc/xray/port)
+ws=$(cari_port $file_port xray_tls)
+ws2=$(cari_port $file_port xray_nontls)
+
+# ws="$(cat ./log-install.txt | grep -w "Websocket TLS" | cut -d: -f2 | sed 's/ //g')"
+# ws2="$(cat ~/log-install.txt | grep -w "Websocket None TLS" | cut -d: -f2 | sed 's/ //g')"
 
 ssl="$(cat ~/log-install.txt | grep -w "Stunnel5" | cut -d: -f2)"
 sqd="$(cat ~/log-install.txt | grep -w "Squid" | cut -d: -f2)"
@@ -46,11 +52,11 @@ systemctl restart ws-nontls
 systemctl restart ssh-ohp
 systemctl restart dropbear-ohp
 systemctl restart openvpn-ohp
-useradd -e `date -d "$masaaktif days" +"%Y-%m-%d"` -s /bin/false -M $Login
+useradd -e $(date -d "$masaaktif days" +"%Y-%m-%d") -s /bin/false -M $Login
 expi="$(chage -l $Login | grep "Account expires" | awk -F": " '{print $2}')"
-echo -e "$Pass\n$Pass\n"|passwd $Login &> /dev/null
-hariini=`date -d "0 days" +"%Y-%m-%d"`
-expi=`date -d "$masaaktif days" +"%Y-%m-%d"`
+echo -e "$Pass\n$Pass\n" | passwd $Login &>/dev/null
+hariini=$(date -d "0 days" +"%Y-%m-%d")
+expi=$(date -d "$masaaktif days" +"%Y-%m-%d")
 echo -e ""
 echo -e "Informasi SSH & OpenVPN"
 echo -e "=============================="
