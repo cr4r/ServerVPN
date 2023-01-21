@@ -15,6 +15,9 @@
 	. <(curl -s https://raw.githubusercontent.com/cr4r/ServerVPN/main/config)
 	rm -rf $home &>/dev/null
 
+	### export port yang dibutuhkan
+	. <(curl -s ${rawRepo}/port)
+
 	mkdir -p $home && cd $home
 
 	msg -warn "Install dan menghidupkan Firewall (UFW)!"
@@ -108,10 +111,10 @@
 	echo "" | tee -a log-install.txt
 	echo "   >>> Service & Port" | tee -a log-install.txt
 	echo "   - SlowDNS SSH             : ALL Port SSH" | tee -a log-install.txt
-	echo "   - OpenSSH                 : 22, 2253" | tee -a log-install.txt
-	echo "   - OpenVPN                 : TCP 1194, UDP 2200, SSL 990" | tee -a log-install.txt
-	echo "   - Stunnel5                : 443, 445" | tee -a log-install.txt
-	echo "   - Dropbear                : 443, 109, 143" | tee -a log-install.txt
+	echo "   - OpenSSH                 : ${ssh1}, ${ssh2}, ${ssh3}" | tee -a log-install.txt
+	echo "   - OpenVPN                 : TCP ${openvpn_tcp}, UDP ${openvpn_udp}, SSL ${openvpn_ssl}" | tee -a log-install.txt
+	echo "   - Stunnel5                : ${stunnel51}, ${stunnel52}" | tee -a log-install.txt
+	echo "   - Dropbear                : ${dropbear1}, ${dropbear2}, ${dropbear3}" | tee -a log-install.txt
 	echo "   - CloudFront Websocket    : " | tee -a log-install.txt
 	echo "   - SSH Websocket TLS       : 443" | tee -a log-install.txt
 	# echo "   - SSH Websocket HTTP      : 8880" | tee -a log-install.txt

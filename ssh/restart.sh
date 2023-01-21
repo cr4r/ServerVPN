@@ -1,25 +1,11 @@
 #!/bin/bash
-# SL
-# ==========================================
-# Color
-RED='\033[0;31m'
-NC='\033[0m'
-GREEN='\033[0;32m'
-ORANGE='\033[0;33m'
-BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
-CYAN='\033[0;36m'
-LIGHT='\033[0;37m'
 # ==========================================
 clear
 echo -e ""
 echo -e "Starting Restart All Service"
 sleep 2
-systemctl stop ws-tls
+cmd "systemctl stop ws-tls"
 systemctl start sslh
-systemctl restart sslh
-/etc/init.d/sslh start
-/etc/init.d/sslh restart
 
 systemctl restart ssrmu
 systemctl restart ws-tls
@@ -39,13 +25,12 @@ systemctl restart dropbear-ohp
 systemctl restart openvpn-ohp
 systemctl restart trojan-go
 
-/etc/init.d/ssrmu restart
 /etc/init.d/ssh restart
 /etc/init.d/dropbear restart
 /etc/init.d/sslh restart
-/etc/init.d/stunnel5 restart
-/etc/init.d/stunnel4 restart
-/etc/init.d/openvpn restart
+cmd "/etc/init.d/stunnel5 restart"
+cmd "/etc/init.d/stunnel4 restart"
+cmd "/etc/init.d/openvpn restart"
 /etc/init.d/fail2ban restart
 /etc/init.d/cron restart
 /etc/init.d/nginx restart

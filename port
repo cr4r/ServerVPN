@@ -1,13 +1,31 @@
 #!/bin/bash
 ### Kumpulan Port untuk instalasi disini
-(
-  badvpn1=7100
-  badvpn2=7200
-  badvpn3=7300
-  ssh1=22
-  ssh2=2253
-  ssh3=42
-  dropbear1=445
-  dropbear2=109
-  dropbear3=143
-) | export
+export webserver_php=900
+export webserver_nginx=89
+
+export openssh=443
+
+export openvpn_tcp=1194
+export openvpn_udp=2200
+export openvpn_ssl=990
+
+export badvpn1=7100
+export badvpn2=7200
+export badvpn3=7300
+
+export ssh1=22
+export ssh2=2253
+export ssh3=42
+
+export dropbear1=445
+export dropbear2=109
+export dropbear3=143
+
+export stunnel51=$openssh
+export stunnel52=$dropbear1
+
+### Xray
+export vmess_tls=8443
+export vmess_nontls=8444
+export vmess_trojan=8445
+export trojango=2087

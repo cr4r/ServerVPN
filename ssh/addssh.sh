@@ -1,20 +1,9 @@
 #!/bin/bash
 
-# ==========================================
-# Color
-RED='\033[0;31m'
-NC='\033[0m'
-GREEN='\033[0;32m'
-ORANGE='\033[0;33m'
-BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
-CYAN='\033[0;36m'
-LIGHT='\033[0;37m'
-# ==========================================
 # Getting
 
-domain=$(cat /etc/xray/domain)
-sldomain=$(cat /root/nsdomain)
+touch $file_config
+
 cdndomain=$(cat /root/awscdndomain)
 slkey=$(cat /etc/slowdns/server.pub)
 clear
@@ -25,38 +14,61 @@ tanya "Expired (Days)" masaaktif
 
 IP=$(wget -qO- ipinfo.io/ip)
 
-portXray=$(cat /etc/xray/port)
-ws=$(cari_port $file_port xray_tls)
-ws2=$(cari_port $file_port xray_nontls)
+ws=$(cari_port $file_port vmess_tls)
+ws2=$(cari_port $file_port vmess_nontls)
 
-# ws="$(cat ./log-install.txt | grep -w "Websocket TLS" | cut -d: -f2 | sed 's/ //g')"
-# ws2="$(cat ~/log-install.txt | grep -w "Websocket None TLS" | cut -d: -f2 | sed 's/ //g')"
+### ws="$(cat ./log-install.txt | grep -w "Websocket TLS" | cut -d: -f2 | sed 's/ //g')"
+### ws2="$(cat ~/log-install.txt | grep -w "Websocket None TLS" | cut -d: -f2 | sed 's/ //g')"
 
 ssl="$(cat ~/log-install.txt | grep -w "Stunnel5" | cut -d: -f2)"
-sqd="$(cat ~/log-install.txt | grep -w "Squid" | cut -d: -f2)"
-ovpn="$(netstat -nlpt | grep -i openvpn | grep -i 0.0.0.0 | awk '{print $4}' | cut -d: -f2)"
-ovpn2="$(netstat -nlpu | grep -i openvpn | grep -i 0.0.0.0 | awk '{print $4}' | cut -d: -f2)"
+ovpn="$(cek_port openvpn tcp)"
+ovpn2="$(cek_port openvpn udp)"
+
+c_port $file_port openvpn_tcp $ovpn
+c_port $file_port openvpn_udp $ovpn2
 clear
-systemctl stop client-sldns
-systemctl stop server-sldns
-pkill sldns-server
-pkill sldns-client
-systemctl enable client-sldns
-systemctl enable server-sldns
-systemctl start client-sldns
-systemctl start server-sldns
-systemctl restart client-sldns
-systemctl restart server-sldns
-systemctl restart ws-tls
-systemctl restart ws-nontls
-systemctl restart ssh-ohp
-systemctl restart dropbear-ohp
-systemctl restart openvpn-ohp
+
+msg -warn "Stop Client SLDNS"
+systemctl stop client-sldns &>/dev/null
+pkill sldns-client &>/dev/null
+systemctl disable client-sldns &>/dev/null
+msg -warn "Stop Server SLDNS"
+systemctl stop server-sldns &>/dev/null
+pkill sldns-server &>/dev/null
+systemctl disable server-sldns &>/dev/null
+
+msg -warn "Start Client SLDNS"
+systemctl enable client-sldns &>/dev/null
+cmd "systemctl start client-sldns"
+msg -warn "Start Server SLDNS"
+systemctl enable server-sldns &>/dev/null
+cmd "systemctl start server-sldns"
+
+msg -warn "restart ws tls"
+cmd "systemctl restart ws-tls"
+msg -warn "restart ws nontls"
+cmd "systemctl restart ws-nontls"
+msg -warn "restart ssh ohp"
+cmd "systemctl restart ssh-ohp"
+msg -warn "restart dropbear ohp"
+cmd "systemctl restart dropbear-ohp"
+msg -warn "restart openvpn ohp"
+cmd "systemctl restart openvpn-ohp"
+
 useradd -e $(date -d "$masaaktif days" +"%Y-%m-%d") -s /bin/false -M $Login
 expi="$(chage -l $Login | grep "Account expires" | awk -F": " '{print $2}')"
 echo -e "$Pass\n$Pass\n" | passwd $Login &>/dev/null
 hariini=$(date -d "0 days" +"%Y-%m-%d")
 expi=$(date -d "$masaaktif days" +"%Y-%m-%d")
+
+ssh1=$(cari_port $file_port ssh1)
+http1=$(cari_port $file_port http1)
+dropbear1=$(cari_port $file_port dropbear1)
+dropbear2=$(cari_port $file_port dropbear2)
+dropbear3=$(cari_port $file_port dropbear3)
+openvpn_ssl=$(cari_port $file_port openvpn_ssl)
+
+touch $file_port
 echo -e ""
 echo -e "Informasi SSH & OpenVPN"
 echo -e "=============================="
@@ -66,22 +78,22 @@ echo -e "Created: $hariini"
 echo -e "Expired: $expi"
 echo -e "===========HOST-SSH==========="
 echo -e "IP/Host: $IP"
-echo -e "Domain SSH: $domain"
-echo -e "Domain Cloudflare: $domain"
+echo -e "Domain SSH: $domain_vps"
+echo -e "Domain Cloudflare: $domain_vps"
 echo -e "Domain CloudFront: $cdndomain"
 echo -e "===========SLOWDNS==========="
 echo -e "Domain Name System(DNS): 8.8.8.8"
-echo -e "Name Server(NS): $sldomain"
+echo -e "Name Server(NS): $domain_slowdns"
 echo -e "DNS PUBLIC KEY: $slkey"
-echo -e "Domain SlowDNS: $sldomain"
+echo -e "Domain SlowDNS: $domain_slowdns"
 echo -e "=========Service-Port========="
 echo -e "SlowDNS: 443,22,109,143"
-echo -e "OpenSSH: 22"
-echo -e "Dropbear: 443, 109, 143"
+echo -e "OpenSSH: $ssh1"
+echo -e "Dropbear: $dropbear1, $dropbear2, $dropbear3"
 echo -e "SSL/TLS: 443"
 echo -e "SSH Websocket SSL/TLS: 443"
-echo -e "SSH Websocket HTTP: 8880"
-echo -e "BadVPN UDPGW: 7100,7200,7300"
+echo -e "SSH Websocket HTTP: $http1"
+echo -e "BadVPN UDPGW: $badvpn1,$badvpn2,$badvpn3"
 echo -e "Proxy CloudFront: [OFF]"
 echo -e "Proxy Squid: [OFF]"
 echo -e "OHP SSH: 8181"
@@ -90,10 +102,10 @@ echo -e "OHP OpenVPN: 8383"
 echo -e "OVPN Websocket: 2086"
 echo -e "OVPN Port TCP: $ovpn"
 echo -e "OVPN Port UDP: $ovpn2"
-echo -e "OVPN Port SSL: 990"
-echo -e "OVPN TCP: http://$IP:89/tcp.ovpn"
-echo -e "OVPN UDP: http://$IP:89/udp.ovpn"
-echo -e "OVPN SSL: http://$IP:89/ssl.ovpn"
+echo -e "OVPN Port SSL: $openvpn_ssl"
+echo -e "OVPN TCP: http://$IP:$webserver_nginx/tcp.ovpn"
+echo -e "OVPN UDP: http://$IP:$webserver_nginx/udp.ovpn"
+echo -e "OVPN SSL: http://$IP:$webserver_nginx/ssl.ovpn"
 echo -e "=============================="
 echo -e "SNI/Server Spoof: isi dengan bug"
 echo -e "Payload Websocket SSL/TLS"

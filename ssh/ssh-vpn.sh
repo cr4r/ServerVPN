@@ -11,16 +11,9 @@ export DEBIAN_FRONTEND=noninteractive
 source /etc/os-release
 ver=$VERSION_ID
 
-#detail nama perusahaan
-country=ID
-state=Indonesia
-locality=Indonesia
-organization=codersfamily
-organizationalunit=codersfamily
-commonname=codersfamily
-email=cr4rrr@gmail.com
-
 . <(curl -s https://raw.githubusercontent.com/cr4r/ServerVPN/main/config)
+### export port yang dibutuhkan
+. <(curl -s ${rawRepo}/port)
 
 # simple password minimal
 wget -O /etc/pam.d/common-password "${pssh}/password" &>/dev/null
@@ -84,64 +77,7 @@ sed -i 's/AcceptEnv/#AcceptEnv/g' /etc/ssh/sshd_config
 echo "clear" >>.profile
 echo "neofetch" >>.profile
 
-# install webserver
-msg -line " Menginstall Web Server "
-msg -org "Menghapus /etc/nginx/sites-enabled/default"
-rm /etc/nginx/sites-enabled/default
-msg -org "Menghapus /etc/nginx/sites-available/default"
-rm /etc/nginx/sites-available/default
-msg -org "Membuat konfigurasi pada /etc/nginx/nginx.conf"
-curl ${pssh}/nginx.conf >/etc/nginx/nginx.conf &>/dev/null
-msg -org "Membuat konfigurasi pada /etc/nginx/conf.d/vps.conf"
-curl ${pssh}/vps.conf >/etc/nginx/conf.d/vps.conf &>/dev/null
-msg -org "sed -i 's/listen = \/var\/run\/php-fpm.sock/listen = 127.0.0.1:9000/g' /etc/php/fpm/pool.d/www.conf"
-sed -i 's/listen = \/var\/run\/php-fpm.sock/listen = 127.0.0.1:9000/g' /etc/php/fpm/pool.d/www.conf
-msg -red "Membuat user *vps*"
-useradd -m vps &>/dev/null
-msg -org "Membuat folder /home/vps/public_html"
-mkdir -p /home/vps/public_html
-msg -org "echo \"<?php phpinfo() ?>\" >/home/vps/public_html/info.php"
-echo "<?php phpinfo() ?>" >/home/vps/public_html/info.php &>/dev/null
-msg -org "chown -R www-data:www-data /home/vps/public_html"
-chown -R www-data:www-data /home/vps/public_html &>/dev/null
-msg -org "chmod -R g+rw /home/vps/public_html"
-chmod -R g+rw /home/vps/public_html &>/dev/null
-msg -org "Menuju ke /home/vps/public_html"
-cd /home/vps/public_html
-msg -org "wget -O /home/vps/public_html/index.html "${pssh}/index.html1""
-wget -O /home/vps/public_html/index.html "${pssh}/index.html1" &>/dev/null
-msg -warn "Restart Nginx"
-cmd "/etc/init.d/nginx restart"
-cd $home
-
-. <(curl -s ${rawRepo}/ipsaya.sh) ### Sudah Fix
-
-# install badvpn
-msg -line " Menginstall badvpn "
-msg -org "Mengunduh dan membuat permission badvpn-udpgw"
-wget -O /usr/bin/badvpn-udpgw "${pssh}/badvpn-udpgw64"
-chmod +x /usr/bin/badvpn-udpgw
-
-maxClientBadVPN=500
-msg -warn "Menjalankan badvpn dengan port 7100, 7200, 7300 dengan max client ${maxClientBadVPN}"
-
-sed -i "$ i\screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:$badvpn1 --max-clients $maxClientBadVPN" /etc/rc.local &>/dev/null
-sed -i "$ i\screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:$badvpn2 --max-clients $maxClientBadVPN" /etc/rc.local &>/dev/null
-sed -i "$ i\screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:$badvpn3 --max-clients $maxClientBadVPN" /etc/rc.local &>/dev/null
-
-screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:$badvpn1 --max-clients $maxClientBadVPN &>/dev/null
-screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:$badvpn2 --max-clients $maxClientBadVPN &>/dev/null
-screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:$badvpn3 --max-clients $maxClientBadVPN &>/dev/null
-
-msg -red "Seting ufw port 7100, 7200, 7300 untuk udpgw"
-ufw allow $badvpn1 &>/dev/null
-ufw allow $badvpn2 &>/dev/null
-ufw allow $badvpn3 &>/dev/null
-
-### Catat Port di /etc/port
-c_port $file_port badvpn1 $badvpn1
-c_port $file_port badvpn2 $badvpn2
-c_port $file_port badvpn3 $badvpn3
+linkinstall="${pssh}/install"
 
 # setting port ssh
 msg -warn "Seting Port ssh ke 22,2253,42"
@@ -157,7 +93,7 @@ sed -i "/Port 22/a Port ${ssh2}" /etc/ssh/sshd_config &>/dev/null
 sed -i "/Port ${ssh2}/a Port ${ssh3}" /etc/ssh/sshd_config &>/dev/null
 cmd "/etc/init.d/ssh restart"
 
-msg -red "Seting ufw port 22, 2253, 42 untuk ssh"
+msg -red "Seting ufw port $ssh1, $ssh2, $ssh3 untuk ssh"
 ufw allow $ssh1 &>/dev/null
 ufw allow $ssh2 &>/dev/null
 ufw allow $ssh3 &>/dev/null
@@ -166,135 +102,26 @@ c_port $file_port ssh1 $ssh1
 c_port $file_port ssh2 $ssh2
 c_port $file_port ssh3 $ssh3
 
+### install webserver
+. <(curl -s ${linkinstall}/ins-webserver.sh)
 
+### install badvpn
+. <(curl -s ${linkinstall}/ins-badvpn.sh)
 
-# Settings SSLH
-msg -org "Setting SSLH"
-msg -org "Membuat konfigurasi /etc/default/sslh"
-rm -f /etc/default/sslh &>/dev/null
-cat >/etc/default/sslh <<-END
-	# Default options for sslh initscript
-	# sourced by /etc/init.d/sslh
+### install vnstat
+. <(curl -s ${linkinstall}/ins-vnstat.sh)
 
-	# Disabled by default, to force yourself
-	# to read the configuration:
-	# - /usr/share/doc/sslh/README.Debian (quick start)
-	# - /usr/share/doc/sslh/README, at "Configuration" section
-	# - sslh(8) via "man sslh" for more configuration details.
-	# Once configuration ready, you *must* set RUN to yes here
-	# and try to start sslh (standalone mode only)
-
-	RUN=yes
-
-	# binary to use: forked (sslh) or single-thread (sslh-select) version
-	# systemd users: don't forget to modify /lib/systemd/system/sslh.service
-	DAEMON=/usr/sbin/sslh
-
-	DAEMON_OPTS="--user sslh --listen 0.0.0.0:443 --ssl 127.0.0.1:777 --ssh 127.0.0.1:$dropbear2 --openvpn 127.0.0.1:1194 --http 127.0.0.1:8880 --pidfile /var/run/sslh/sslh.pid -n"
-END
-
-# Restart Service SSLH
-msg -org "Restart Service SSLH"
-cmd "systemctl restart sslh"
-cmd "/etc/init.d/sslh status"
-
-msg -line " Setting vnstat "
-cd $home
-# setting vnstat
-cmd "/etc/init.d/vnstat restart"
-msg -org "Sedang mengupdate vnstat"
-wget https://humdi.net/vnstat/vnstat-2.6.tar.gz &>/dev/null
-tar zxvf vnstat-2.6.tar.gz &>/dev/null
-
-msg -warn "Sedang build vnstat, mungkin membutuhkan waktu lama"
-cd vnstat-2.6
-./configure --prefix=/usr --sysconfdir=/etc &>/dev/null
-make &>/dev/null
-make install &>/dev/null
-cd $home
-msg -org "Konfigurasi vnstat"
-vnstat -u -i $NET &>/dev/null
-sed -i 's/Interface "'""eth0""'"/Interface "'""$NET""'"/g' /etc/vnstat.conf &>/dev/null
-chown vnstat:vnstat /var/lib/vnstat -R &>/dev/null
-msg -org "Start VNSTAT"
-systemctl enable vnstat &>/dev/null
-/etc/init.d/vnstat restart &>/dev/null
-rm -rf $home/vnstat-2.6 $home/vnstat-2.6.tar.gz &>/dev/null
-
-### install stunnel 5
-msg -line " Instalasi Stunnel "
-cd $home
-msg -org "Download Stunnel"
-wget -q -O stunnel5.zip "${pstunnel5}/stunnel5.zip" &>/dev/nul && unzip -o stunnel5.zip &>/dev/nul
-msg -org "Build Stunnel, mungkin membutuhkan waktu lama"
-cd $home/stunnel && chmod +x configure && ./configure &>/dev/null
-make &>/dev/null && make install &>/dev/null
-cd $home && rm -rf stunnel stunnel5.zip &>/dev/null && mkdir -p /etc/stunnel5 && chmod 644 /etc/stunnel5
-
-cat >/etc/stunnel5/stunnel5.conf <<-END
-	cert = /etc/xray/xray.crt
-	key = /etc/xray/xray.key
-	client = no
-	socket = a:SO_REUSEADDR=1
-	socket = l:TCP_NODELAY=1
-	socket = r:TCP_NODELAY=1
-
-	[dropbear]
-	accept = 445
-	connect = 127.0.0.1:$dropbear2
-
-	[openssh]
-	accept = 777
-	connect = 127.0.0.1:443
-
-	[openvpn]
-	accept = 990
-	connect = 127.0.0.1:1194
-
-END
-
-c_port $file_port stunnel $portTLS
-
-### make a certificate
-msg -gr "Membuat sertifikat untuk stunnel5"
-openssl genrsa -out key.pem 2048 &>/dev/null
-openssl req -new -x509 -key key.pem -out cert.pem -days 1095 \
-	-subj "/C=$country/ST=$state/L=$locality/O=$organization/OU=$organizationalunit/CN=$commonname/emailAddress=$email" &>/dev/null
-msg -gr "Copy ke /etc/stunnel5/stunnel5.pem"
-cat key.pem cert.pem >>/etc/stunnel5/stunnel5.pem &>/dev/null
-
-### Restart Service Stunnel5
-cmd "systemctl restart stunnel5"
-cat >/etc/systemd/system/stunnel5.service <<END
-[Unit]
-Description=Stunnel5 Service
-Documentation=https://stunnel.org
-Documentation=https://github.com/cr4r
-After=syslog.target network-online.target
-
-[Service]
-ExecStart=/usr/local/bin/stunnel5 /etc/stunnel5/stunnel5.conf
-Type=forking
-
-[Install]
-WantedBy=multi-user.target
-END
-
-# # Service Stunnel5 /etc/init.d/stunnel5
-cmd "wget -q -O /etc/init.d/stunnel5 ${pstunnel5}/stunnel5.init"
-
-### Ubah Izin Akses
-chmod 600 /etc/stunnel5/stunnel5.pem &>/dev/null
-chmod +x /etc/init.d/stunnel5 &>/dev/null
-cp /usr/local/bin/stunnel /usr/local/bin/stunnel5 &>/dev/null
-
-### Restart Stunnel 5
-cmd "systemctl stop stunnel5"
-cmd "systemctl start stunnel5"
-cmd "systemctl enable stunnel5"
+### install dropbear
+. <(curl -s ${linkinstall}/ins-dropbear.sh)
 
 ### OpenVPN
-. <(curl -s ${pssh}/vpn.sh)
+. <(curl -s ${linkinstall}/inst-ovpn.sh)
+
+### install stunnel5
+. <(curl -s ${linkinstall}/inst-stunnel5.sh)
+
+# Settings SSLH
+. <(curl -s ${linkinstall}/ins-sslh.sh)
 
 mkdir -p /usr/local/ddos
 
@@ -308,7 +135,7 @@ sed -i 's@DROPBEAR_BANNER=""@DROPBEAR_BANNER="/etc/issue.net"@g' /etc/default/dr
 ### Ganti Banner
 wget -O /etc/issue.net "${pssh}/issue.net"
 
-### blockir torrent
+### block torrent
 iptables -A FORWARD -m string --string "get_peers" --algo bm -j DROP
 iptables -A FORWARD -m string --string "announce_peer" --algo bm -j DROP
 iptables -A FORWARD -m string --string "find_node" --algo bm -j DROP
@@ -333,11 +160,11 @@ wget -O about "${pssh}/about.sh"
 wget -O menu "${rawRepo}/update/menu.sh"
 wget -O addssh "${pssh}/addssh.sh"
 wget -O trialssh "${pssh}/trialssh.sh"
-# wget -O delssh "${pssh}/delssh.sh"
-# wget -O member "${pssh}/member.sh"
-# wget -O delexp "${pssh}/delexp.sh"
-# wget -O cekssh "${pssh}/cekssh.sh"
-# wget -O restart "${pssh}/restart.sh"
+wget -O delssh "${pssh}/delssh.sh"
+wget -O member "${pssh}/member.sh"
+wget -O delexp "${pssh}/delexp.sh"
+wget -O cekssh "${pssh}/cekssh.sh"
+wget -O restart "${pssh}/restart.sh"
 # wget -O speedtest "${pssh}/speedtest_cli.py"
 # wget -O info "${pssh}/info.sh"
 # wget -O ram "${pssh}/ram.sh"

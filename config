@@ -41,18 +41,14 @@ msg() {
 }
 
 cek_port() {
-  [[ $1 = "" ]] && echo -e "\033[1;31moff" && return 0
-  unset port
-  port_var=$(lsof -V -i -P -n | grep -v "ESTABLISHED" | grep -v "COMMAND")
-  i=0
-  while read port; do
-    var1=$(echo $port | awk '{print $1}') && var2=$(echo $port | awk '{print $9}' | awk -F ":" '{print $2}')
-    [[ "$(echo -e ${port[@]} | grep "$var1 $var2")" ]] || {
-      port[$i]="$var1 $var2\n"
-      let i++
-    }
-  done <<<"$port_var"
-  [[ $(echo "${port[@]}" | grep "$1") ]] && echo -e "\033[1;32mon" || echo -e "\033[1;31moff"
+  toolnya=$1   ### nginx/apache/.... etc
+  type_port=$2 ### udp/tcp
+  if [[ $type_port == "udp" ]]; then
+    type_port="nlpu"
+  else
+    type_port="nlpt"
+  fi
+  printf "$(netstat -$type_port | grep -i $toolnya | grep -i 0.0.0.0 | awk '{print $4}' | cut -d: -f2)"
 }
 
 inst_comp() {
@@ -221,6 +217,7 @@ export -f c_port
 
 ### Export Variabel
 export HomeRepo="/root/ServerVPN"
+export home_github="https://github.com/cr4r"
 export rawRepo="https://raw.githubusercontent.com/cr4r/ServerVPN/main"
 export dir_slh="/etc/slowdns"
 export dir_v2ray="/etc/v2ray"
@@ -246,6 +243,7 @@ export ptrojango="${rawRepo}/trojango"
 export pstunnel5="${rawRepo}/stunnel5"
 export psldns="${rawRepo}/SLDNS"
 export psslh="${rawRepo}/sslh-fix"
-export file_port=/etc/port
+export file_port="/etc/port"
+export file_config="/etc/config.env"
 ### Jika ingin run function secara langsung
 $1

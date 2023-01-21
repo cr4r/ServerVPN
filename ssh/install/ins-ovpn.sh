@@ -3,15 +3,7 @@
 # ==========================================
 # Color
 . <(curl -s https://raw.githubusercontent.com/cr4r/ServerVPN/main/config)
-RED='\033[0;31m'
-NC='\033[0m'
-GREEN='\033[0;32m'
-ORANGE='\033[0;33m'
-BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
-CYAN='\033[0;36m'
-LIGHT='\033[0;37m'
-# Mod By SL
+
 # ==================================================
 export DEBIAN_FRONTEND=noninteractive
 OS=$(uname -m)
@@ -53,7 +45,7 @@ cat >/etc/openvpn/tcp.ovpn <<-END
 client
 dev tun
 proto tcp
-remote xxxxxxxxx 1194
+remote xxxxxxxxx $openvpn_tcp
 resolv-retry infinite
 route-method exe
 nobind
@@ -71,7 +63,7 @@ cat >/etc/openvpn/udp.ovpn <<-END
 client
 dev tun
 proto udp
-remote xxxxxxxxx 2200
+remote xxxxxxxxx $openvpn_udp
 resolv-retry infinite
 route-method exe
 nobind
@@ -89,7 +81,7 @@ cat >/etc/openvpn/ssl.ovpn <<-END
 client
 dev tun
 proto tcp
-remote xxxxxxxxx 990
+remote xxxxxxxxx $openvpn_ssl
 resolv-retry infinite
 route-method exe
 nobind
@@ -146,7 +138,7 @@ cmd "systemctl enable openvpn"
 cmd "systemctl start openvpn"
 cmd "/etc/init.d/openvpn restart"
 
-
-
 # Delete script
 history -c
+
+cd $home

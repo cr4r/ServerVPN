@@ -5,20 +5,28 @@
 NC='\033[0m'
 
 MYIP=$(wget -qO- ipinfo.io/ip)
-domain=$(cat /etc/xray/domain)
 
-install_all_component $(curl -Ls https://raw.githubusercontent.com/cr4r/ServerVPN/main/xray/plugin) && tput cuu1
+source $file_config
+domain=$domain_vps
+
+install_all_component $(curl -Ls $pxray/plugin) && tput cuu1
+
 msg -org "Update jam pada server"
 ntpdate pool.ntp.org &>/dev/null
 timedatectl set-ntp true &>/dev/null
+
 msg -org "systemctl enable chronyd && systemctl restart chronyd"
 systemctl enable chronyd &>/dev/null && systemctl restart chronyd &>/dev/null
+
 msg -org "systemctl enable chrony && systemctl restart chrony"
 systemctl enable chrony &>/dev/null && systemctl restart chrony &>/dev/null
+
 msg -org "timedatectl set-timezone Asia/Jakarta"
 timedatectl set-timezone Asia/Jakarta &>/dev/null
+
 msg -org "chronyc sourcestats"
 chronyc sourcestats -v &>/dev/null
+
 msg -org "chronyc tracking "
 chronyc tracking -v &>/dev/null
 msg -org "$(date)"
@@ -124,12 +132,9 @@ uuid6=$(cat /proc/sys/kernel/random/uuid)
 
 ### Buat Config Xray
 msg -line " Buat Config Xray "
-pathV2ray="/worryfree/"
+pathV2ray="/worryfree"
 pathVless=$pathV2ray
-portTLS=8443
-portNonTLS=8444
-portrojan=8445
-portrojango=2087
+
 cat >/etc/xray/config.json <<END
 {
   "log": {
@@ -139,7 +144,7 @@ cat >/etc/xray/config.json <<END
   },
   "inbounds": [
     {
-      "port": ${portTLS},
+      "port": ${vmess_tls},
       "protocol": "vmess",
       "settings": {
         "clients": [
@@ -174,7 +179,7 @@ cat >/etc/xray/config.json <<END
       }
     },
     {
-      "port": ${portNonTLS},
+      "port": ${vmess_nontls},
       "protocol": "vmess",
       "settings": {
         "clients": [
@@ -210,7 +215,7 @@ cat >/etc/xray/config.json <<END
       }
     },
     {
-      "port": ${portTLS},
+      "port": ${vmess_tls},
       "protocol": "vless",
       "settings": {
         "clients": [
@@ -253,7 +258,7 @@ cat >/etc/xray/config.json <<END
       }
     },
     {
-      "port": ${portNonTLS},
+      "port": ${vmess_nontls},
       "protocol": "vless",
       "settings": {
         "clients": [
@@ -288,7 +293,7 @@ cat >/etc/xray/config.json <<END
       }
     },
     {
-      "port": ${portrojan},
+      "port": ${vmess_trojan},
       "protocol": "trojan",
       "settings": {
         "clients": [
@@ -405,7 +410,7 @@ msg -org "Buat File >/etc/systemd/system/xray.service"
 cat <<EOF >/etc/systemd/system/xray.service
 [Unit]
 Description=Xray Service Mod By SL
-Documentation=https://github.com/cr4r
+Documentation=$home_github
 After=network.target nss-lookup.target
 
 [Service]
@@ -420,17 +425,6 @@ RestartPreventExitStatus=23
 [Install]
 WantedBy=multi-user.target
 EOF
-
-### Menambahkan port pada ufw untuk xray
-# # Accept port Xray
-msg -warn "Menambahkan port pada ufw untuk xray!"
-msg -red "$portTLS, $portNonTLS, $portFallBack"
-ufw allow ${portTLS}/tcp &>/dev/null
-ufw allow ${portTLS}/udp &>/dev/null
-ufw allow ${portNonTLS}/udp &>/dev/null
-ufw allow ${portNonTLS}/tcp &>/dev/null
-ufw allow ${portFallBack}/udp &>/dev/null
-ufw allow ${portFallBack}/tcp &>/dev/null
 
 msg -warn "Memulai service xray"
 systemctl daemon-reload
@@ -471,7 +465,7 @@ cat >/etc/trojan-go/config.json <<END
 {
   "run_type": "server",
   "local_addr": "0.0.0.0",
-  "local_port": $portrojango,
+  "local_port": $trojango,
   "remote_addr": "127.0.0.1",
   "remote_port": 89,
   "log_level": 1,
@@ -558,8 +552,6 @@ $uuid
 END
 
 ### restart
-msg -org "ufw allow port $portrojango"
-ufw allow $portrojango &>/dev/null
 
 msg -warn "Restart Service trojan GO"
 systemctl daemon-reload &>/dev/null
@@ -569,25 +561,39 @@ systemctl enable trojan-go &>/dev/null
 systemctl restart trojan-go &>/dev/null
 
 msg -warn "Instalasi Xray dan Trojan Go Selesai!"
-msg -line " Informasi tentang Xray "
 msg -warn "VMESS"
-msg -org "Servername : $(cat ${dir_xray}/domain)"
-msg -org "Port TLS : ${portTLS}"
-msg -org "Port None TLS : ${portNonTLS}"
-msg -org "Port FallBack: ${portFallBack}"
+msg -org "Servername : $domain"
+msg -org "Port TLS : ${vmess_tls}"
+msg -org "Port None TLS : ${vmess_nontls}"
+msg -org "Port Trojan: ${vmess_trojan}"
 msg -line
 msg -warn "VMESS"
-msg -org "Servername : $(cat ${dir_xray}/domain)"
+msg -org "Servername : $domain"
 msg -org "Port : 89"
 
-c_port $file_port xray_tls $portTLS
-c_port $file_port xray_nontls $portNonTLS
-c_port $file_port xray_trojan $portrojan
-c_port $file_port trojango $portrojango
+c_port $file_port xray_tls $vmess_tls
+c_port $file_port xray_nontls $vmess_nontls
+c_port $file_port xray_trojan $vmess_trojan
+c_port $file_port trojango $trojango
 
 cat <<EOF >/etc/xray/port
-tls-xray=${portTLS}
-nontls-xray=${portNonTLS}
-xray_trojan=${portrojan}
-trojango=${portrojango}
+tls-xray=${vmess_tls}
+nontls-xray=${vmess_nontls}
+xray_trojan=${vmess_trojan}
+trojango=${trojango}
 EOF
+
+##################################################
+### Accept port Xray
+msg -warn "Menambahkan port pada ufw untuk xray!"
+msg -red "$vmess_tls, $vmess_nontls, $vmess_trojan"
+ufw allow ${vmess_tls}/tcp &>/dev/null
+ufw allow ${vmess_tls}/udp &>/dev/null
+ufw allow ${vmess_nontls}/udp &>/dev/null
+ufw allow ${vmess_nontls}/tcp &>/dev/null
+ufw allow ${vmess_trojan}/udp &>/dev/null
+ufw allow ${vmess_trojan}/tcp &>/dev/null
+
+### Menambahkan port pada ufw untuk xray
+msg -org "ufw allow port $trojango"
+ufw allow $trojango &>/dev/null

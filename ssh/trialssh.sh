@@ -1,19 +1,9 @@
 #!/bin/bash
 # SL
 # ==========================================
-# Color
-RED='\033[0;31m'
-NC='\033[0m'
-GREEN='\033[0;32m'
-ORANGE='\033[0;33m'
-BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
-CYAN='\033[0;36m'
-LIGHT='\033[0;37m'
-# ==========================================
 . <(curl -s https://raw.githubusercontent.com/cr4r/ServerVPN/main/config)
 
-source /var/crot/ipvps.conf
+# source /var/crot/ipvps.conf
 domain=$(cat /etc/xray/domain)
 clear
 
@@ -21,7 +11,7 @@ ssl="$(cat ~/log-install.txt | grep -w "Stunnel5" | cut -d: -f2)"
 sqd="$(cat ~/log-install.txt | grep -w "Squid" | cut -d: -f2)"
 ovpn="$(netstat -nlpt | grep -i openvpn | grep -i 0.0.0.0 | awk '{print $4}' | cut -d: -f2)"
 ovpn2="$(netstat -nlpu | grep -i openvpn | grep -i 0.0.0.0 | awk '{print $4}' | cut -d: -f2)"
-Login=Trial$(tr </dev/urandom -dc X-Z0-9 | head -c4)
+Login=$(tr </dev/urandom -dc X-Z0-9 | head -c4)
 hari="1"
 Pass=1
 clear
@@ -34,6 +24,22 @@ useradd -e $(date -d "$masaaktif days" +"%Y-%m-%d") -s /bin/false -M $Login
 exp="$(chage -l $Login | grep "Account expires" | awk -F": " '{print $2}')"
 hariini=$(date -d "0 days" +"%Y-%m-%d")
 expi=$(date -d "$masaaktif days" +"%Y-%m-%d")
+
+ssh1=$(cari_port $file_port ssh1)
+ssl1=$(cari_port $file_port ssh1)
+http1=$(cari_port $file_port http1)
+dropbear1=$(cari_port $file_port dropbear1)
+dropbear2=$(cari_port $file_port dropbear2)
+dropbear3=$(cari_port $file_port dropbear3)
+badvpn1=$(cari_port $file_port badvpn1)
+badvpn2=$(cari_port $file_port badvpn2)
+badvpn3=$(cari_port $file_port badvpn3)
+openvpn_ssl=$(cari_port $file_port openvpn_ssl)
+ovpn_tcp="$(cek_port $file_port openvpn_tcp)"
+ovpn_udp="$(cek_port $file_port openvpn_udp)"
+ovpn_ssl="$(cek_port $file_port ovpn_ssl)"
+webserver_nginx="$(cek_port $file_port webserver_nginx)"
+
 echo -e "$Pass\n$Pass\n" | passwd $Login &>/dev/null
 echo -e ""
 echo -e "Informasi Trial SSH & OpenVPN"
@@ -42,23 +48,23 @@ echo -e "IP/Host            : $IP"
 echo -e "Domain             : $domain"
 echo -e "Username           : $Login"
 echo -e "Password           : $Pass"
-echo -e "OpenSSH            : 443, 22"
-echo -e "Dropbear           : 443, 109, 143"
-echo -e "SSL/TLS            :$ssl"
-echo -e "Port Squid         :$sqd"
+echo -e "OpenSSH            : $ssh1"
+echo -e "Dropbear           : $dropbear1, $dropbear2, $dropbear3"
+echo -e "SSL/TLS            : $ssl1"
+echo -e "Port Squid         : $sqd"
 echo -e "OHP SSH            : 8181"
 echo -e "OHP Dropbear       : 8282"
 echo -e "OHP OpenVPN        : 8383"
 echo -e "SSH Websocket SSL  : 443"
-echo -e "SSH Websocket HTTP : 8880"
+echo -e "SSH Websocket HTTP : $http1"
 echo -e "OVPN Websocket     : 2086"
 echo -e "OVPN Port TCP      : $ovpn"
 echo -e "OVPN Port UDP      : $ovpn2"
-echo -e "OVPN Port SSL      : 990"
-echo -e "OVPN TCP           : http://$IP:89/tcp.ovpn"
-echo -e "OVPN UDP           : http://$IP:89/udp.ovpn"
-echo -e "OVPN SSL           : http://$IP:89/ssl.ovpn"
-echo -e "BadVpn             : 7100-7200-7300"
+echo -e "OVPN Port SSL      : $ovpn_ssl"
+echo -e "OVPN TCP           : http://$IP:$webserver_nginx/tcp.ovpn"
+echo -e "OVPN UDP           : http://$IP:$webserver_nginx/udp.ovpn"
+echo -e "OVPN SSL           : http://$IP:$webserver_nginx/ssl.ovpn"
+echo -e "BadVpn             : $badvpn1,$badvpn2,$badvpn3"
 echo -e "Created            : $hariini"
 echo -e "Expired            : $expi"
 echo -e "=============================="
@@ -70,4 +76,3 @@ echo -e "Payload Websocket HTTP"
 echo -e "=============================="
 echo -e "GET / HTTP/1.1[crlf]Host: ${domain}[crlf]Upgrade: websocket[crlf][crlf]"
 echo -e "=============================="
-echo -e "Script Mod By SL"

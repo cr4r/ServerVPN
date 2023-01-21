@@ -114,4 +114,11 @@ echo $SUB_DOMAIN >$home/domain
 echo "$SUB_DOMAIN" >/etc/v2ray/domain
 echo "$SUB_DOMAIN" >/etc/xray/domain
 echo "$NS_DOMAIN" >/etc/slowdns/nsdomain
+
+if [[ ! -f $file_config ]]; then
+  touch $file_config
+fi
+c_port $file_config domain_vps $SUB_DOMAIN
+c_port $file_config domain_slowdns $NS_DOMAIN
+
 pause
